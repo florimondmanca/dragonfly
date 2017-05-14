@@ -1,3 +1,4 @@
+-- example prefab
 return {
     name = 'Circle',
     components = {
