@@ -253,10 +253,6 @@ function GameScene:applySettings()
     love.window.setTitle(self.settings.window.title or 'Untitled')
     -- graphics
     love.graphics.setBackgroundColor(self.settings.graphics.backgroundColor)
-    -- physics
-    if self.settings.enablePhysics then
-        self.globals.world = love.physics.newWorld(0, 0)
-    end
 end
 
 function GameScene:load(src)
@@ -294,7 +290,6 @@ function GameScene:load(src)
 end
 
 function GameScene:update(dt)
-    if self.globals.world then self.globals.world:update(dt) end
     GameScene.super.update(self, dt)
 end
 

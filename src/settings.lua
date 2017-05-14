@@ -8,5 +8,4 @@ return {
     graphics = {
         backgroundColor = {200, 200, 255},
     },
-    enablePhysics = true,
 }
