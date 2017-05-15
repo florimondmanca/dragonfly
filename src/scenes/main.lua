@@ -64,7 +64,13 @@ return {
                 x = 600,
                 y = love.graphics.getHeight()/2
             }},
-            prefab = 'prefabs.enemy1'
+            prefab = 'prefabs.enemy1',
+            prefabComponents = {
+                {
+                    script = 'components.physics_motor',
+                    arguments = {speed = 70}
+                }
+            }
         },
         {
             name = 'Enemy',
@@ -72,7 +78,13 @@ return {
                 x = 675,
                 y = love.graphics.getHeight()/2
             }},
-            prefab = 'prefabs.enemy1'
+            prefab = 'prefabs.enemy1',
+            prefabComponents = {
+                {
+                    script = 'components.physics_motor',
+                    arguments = {speed = 40}
+                }
+            }
         },
         {
             name = 'Enemy',

@@ -3,19 +3,19 @@ local Motor = require 'components.motor'
 
 local Component = rope.Component:subclass('RandomChaseMotorController')
 
-local function newTargetPosition(axis)
+local function newTargetPosition(axis, min, max)
     if axis == 'y' then
         return function(self)
             self.targetPos = {
                 x = self.gameObject.transform.position.x,
-                y = love.math.random() * love.graphics.getHeight()
+                y = (min + (max - min) * love.math.random()) * love.graphics.getHeight()
             }
             self.direction = (self.targetPos.y > self.gameObject.transform.position.y) and 1 or -1
         end
     elseif axis == 'x' then
         return function(self)
             self.targetPos = {
-                x = love.math.random() * love.graphics.getWidth(),
+                x = (min + (max - min) * love.math.random()) * love.graphics.getWidth(),
                 y = self.gameObject.transform.position.y
             }
             print(self.targetPos.x, self.targetPos.y)
@@ -27,10 +27,13 @@ end
 
 function Component:initialize(arguments)
     self:validate(arguments, 'axis')
+    arguments.min = arguments.min or 0
+    arguments.max = arguments.max or 1
     arguments.direction = 0
     self.motor = nil
     rope.Component.initialize(self, arguments)
-    self.newTargetPosition = newTargetPosition(self.axis)
+    self.newTargetPosition = newTargetPosition(
+        self.axis, arguments.min or 0, arguments.max or 1)
 end
 
 
