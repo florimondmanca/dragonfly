@@ -31,10 +31,10 @@ end
 
 function Component:update() end
 
-local function buildComponent(componentFilename, arguments)
-    local componentClass = require(componentFilename)
-    assert(componentClass, 'Component ' .. componentFilename .. ' not found')
-    return componentClass(arguments)
+local function loadComponent(filename)
+    local componentClass = require(filename)
+    assert(componentClass, 'Could not find component at ' .. filename)
+    return componentClass
 end
 
 
@@ -342,5 +342,5 @@ return {
     Component = Component,
     GameObject = GameObject,
     GameScene = GameScene,
-    buildComponent = buildComponent
+    loadComponent = loadComponent
 }

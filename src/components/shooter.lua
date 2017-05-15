@@ -1,9 +1,4 @@
 local rope = require 'rope'
-local geometry = require 'rope.geometry'
-local Velocity = require 'components.velocity'
-local ImageRenderer = require 'rope.builtins.graphics.image_renderer'
-local DieOutOfScreen = require 'components.die_out_of_screen'
-
 
 local Component = rope.Component:subclass('Shooter')
 
@@ -16,15 +11,20 @@ end
 
 function Component:shoot()
     local bulletObject = rope.GameObject(
-        self.gameObject.parent, 'Bullet',
-        geometry.Transform(
-            {x = self.gameObject.transform.position.x + self.shiftX,
+        self.gameObject.parent, 'Bullet', {position = {
+            x = self.gameObject.transform.position.x + self.shiftX,
             y = self.gameObject.transform.position.y + self.shiftY}
-        )
+        }
     )
-    bulletObject:addComponent(Velocity{vx=self.bulletSpeed})
-    bulletObject:addComponent(ImageRenderer{filename=self.filename})
-    bulletObject:addComponent(DieOutOfScreen())
+    bulletObject:addComponent(
+        rope.loadComponent('components.velocity'){vx=self.bulletSpeed}
+    )
+    bulletObject:addComponent(
+        rope.loadComponent('rope.builtins.graphics.image_renderer')
+        {filename=self.filename}
+    )
+    bulletObject:addComponent(
+        rope.loadComponent(('components.die_out_of_screen'))())
 end
 
 return Component
