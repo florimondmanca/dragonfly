@@ -35,6 +35,7 @@ return {
                         bulletSpeed = 500,
                         shiftX = 108,
                         shiftY = 24,
+                        filename = 'static/img/bullet.png',
                     }
                 },
                 -- events

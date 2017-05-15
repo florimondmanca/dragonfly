@@ -8,7 +8,7 @@ local DieOutOfScreen = require 'components.die_out_of_screen'
 local Component = rope.Component:subclass('Shooter')
 
 function Component:initialize(arguments)
-    self:validate(arguments, 'bulletSpeed')
+    self:validate(arguments, 'bulletSpeed', 'filename')
     arguments.shiftX = arguments.shiftX or 0
     arguments.shiftY = arguments.shiftY or 0
     rope.Component.initialize(self, arguments)
@@ -23,7 +23,7 @@ function Component:shoot()
         )
     )
     bulletObject:addComponent(Velocity{vx=self.bulletSpeed})
-    bulletObject:addComponent(ImageRenderer{filename='static/img/bullet.png'})
+    bulletObject:addComponent(ImageRenderer{filename=self.filename})
     bulletObject:addComponent(DieOutOfScreen())
 end
 

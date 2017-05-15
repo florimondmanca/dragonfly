@@ -17,7 +17,7 @@ end
 function Component:validate(arguments, ...)
     for _, argName in ipairs{...} do
         if arguments[argName] == nil then
-            error(argName .. ' must be declared, nil given')
+            error(argName .. ' must be declared for component ' .. tostring(self) .. ', nil given')
         end
     end
 end
