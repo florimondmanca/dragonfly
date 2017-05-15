@@ -64,22 +64,23 @@ return {
                 x = 600,
                 y = love.graphics.getHeight()/2
             }},
-            components = {
-                -- image
-                {
-                    script = 'rope.builtins.graphics.image_renderer',
-                    arguments = {filename = 'static/img/enemy.png'}
-                },
-                -- motion control
-                {
-                    script = 'components.motor',
-                    arguments = {axis = 'y', speed = 50}
-                },
-                {
-                    script = 'components.ai_motor_controller',
-                    arguments = {axis = 'y', meanChangeTime = 3}
-                }
-            }
+            prefab = 'prefabs.enemy1'
+        },
+        {
+            name = 'Enemy',
+            transform = {position = {
+                x = 675,
+                y = love.graphics.getHeight()/2
+            }},
+            prefab = 'prefabs.enemy1'
+        },
+        {
+            name = 'Enemy',
+            transform = {position = {
+                x = 750,
+                y = love.graphics.getHeight()/2
+            }},
+            prefab = 'prefabs.enemy1'
         }
     },
 }

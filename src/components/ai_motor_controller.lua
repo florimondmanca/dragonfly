@@ -1,7 +1,7 @@
 local rope = require 'rope'
 local Motor = require 'components.motor'
 
-local Component = rope.Component:subclass('InputMotorController')
+local Component = rope.Component:subclass('AIMotorController')
 
 function Component:initialize(arguments)
     self:validate(arguments, 'axis')
