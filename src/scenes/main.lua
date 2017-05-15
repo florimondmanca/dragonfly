@@ -33,10 +33,10 @@ return {
                 {
                     script = 'components.shooter',
                     arguments = {
-                        bulletSpeed = 500,
+                        bulletSpeed = 200,
                         shiftX = 108,
                         shiftY = 24,
-                        filename = 'static/img/bullet.png',
+                        filename = 'static/img/bullet-right.png',
                     }
                 },
                 -- events
@@ -92,6 +92,19 @@ return {
                 x = 750,
                 y = love.graphics.getHeight()/2
             }},
+            components = {
+                {
+                    script = 'components.shooter',
+                    arguments = {
+                        bulletSpeed = -200,
+                        filename = 'static/img/bullet-left.png',
+                    }
+                },
+                {
+                    script = 'components.random_shooter_controller',
+                    arguments = {meanWaitTime = 3, waitTimeSigma = 1}
+                }
+            },
             prefab = 'prefabs.enemy1'
         }
     },
