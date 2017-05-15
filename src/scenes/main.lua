@@ -29,6 +29,7 @@ return {
                     script = 'components.input_motor_controller',
                     arguments = {axis='y', keyPlus='down', keyMinus='up'}
                 },
+                -- shooting
                 {
                     script = 'components.shooter',
                     arguments = {
@@ -57,5 +58,28 @@ return {
                 },
             },
         },
+        {
+            name = 'Enemy',
+            transform = {position = {
+                x = 600,
+                y = love.graphics.getHeight()/2
+            }},
+            components = {
+                -- image
+                {
+                    script = 'rope.builtins.graphics.image_renderer',
+                    arguments = {filename = 'static/img/enemy.png'}
+                },
+                -- motion control
+                {
+                    script = 'components.motor',
+                    arguments = {axis = 'y', speed = 50}
+                },
+                {
+                    script = 'components.ai_motor_controller',
+                    arguments = {axis = 'y', meanChangeTime = 3}
+                }
+            }
+        }
     },
 }
