@@ -15,6 +15,7 @@ function Component:initialize(arguments)
 end
 
 function Component:validate(arguments, ...)
+    arguments = arguments or {}
     for _, argName in ipairs{...} do
         if arguments[argName] == nil then
             error(argName .. ' must be declared for component ' .. tostring(self) .. ', nil given')
