@@ -29,6 +29,12 @@ end
 
 function Component:update() end
 
+local function buildComponent(componentFilename, arguments)
+    local componentClass = require(componentFilename)
+    assert(componentClass, 'Component ' .. componentFilename .. ' not found')
+    return componentClass(arguments)
+end
+
 
 -- [[ Game Entity ]] --
 
@@ -306,4 +312,5 @@ return {
     Component = Component,
     GameObject = GameObject,
     GameScene = GameScene,
+    buildComponent = buildComponent
 }

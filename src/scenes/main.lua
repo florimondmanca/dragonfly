@@ -28,7 +28,28 @@ return {
                 {
                     script = 'components.input_motor_controller',
                     arguments = {axis='y', keyPlus='down', keyMinus='up'}
-                }
+                },
+                {
+                    script = 'components.shooter',
+                    arguments = {bulletSpeed = 1000}
+                },
+                -- events
+                {
+                    script = 'rope.builtins.event.event_manager',
+                    arguments = {events = {'shoot'}}
+                },
+                {
+                    script = 'rope.builtins.event.trigger',
+                    arguments = {key = 'space', event = 'shoot'}
+                },
+                {
+                    script = 'rope.builtins.event.event_listener',
+                    arguments = {
+                        event = 'shoot',
+                        targetComponent = 'components.shooter',
+                        targetFunction = 'shoot'
+                    }
+                },
             },
         },
     },

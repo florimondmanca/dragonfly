@@ -9,7 +9,6 @@ function Trigger:initialize(arguments)
 end
 
 function Trigger:keypressed(key)
-    print('keypressed:', key)
     if key == self.key then
         local e = self.globals.events[self.event]
         assert(e, 'Trigger could not find event ' .. self.event)
