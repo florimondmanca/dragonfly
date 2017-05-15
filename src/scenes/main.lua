@@ -31,7 +31,11 @@ return {
                 },
                 {
                     script = 'components.shooter',
-                    arguments = {bulletSpeed = 1000}
+                    arguments = {
+                        bulletSpeed = 500,
+                        shiftX = 108,
+                        shiftY = 24,
+                    }
                 },
                 -- events
                 {

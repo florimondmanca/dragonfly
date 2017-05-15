@@ -1,5 +1,6 @@
 local class = require 'rope.class'
 local geometry = require 'rope.geometry'
+local collections = require 'rope.collections'
 
 
 --[[ Component ]]--
@@ -105,12 +106,11 @@ end
 
 local GameObject = GameEntity:subclass('GameObject')
 
-function GameObject:initialize(scene, name, transform, parent)
+function GameObject:initialize(scene, name, transform)
     self.globals = scene.globals
     self.name = name
-    GameEntity.initialize(self, transform, parent)
+    GameEntity.initialize(self, transform, scene)
     self.components = {}
-    scene:addChild(self)
     scene:addGameObject(self)
 end
 
@@ -149,6 +149,10 @@ end
 
 function GameObject:getComponents(componentType, filter)
     return getComponents(self, componentType, nil, filter)
+end
+
+function GameObject:destroy()
+    self.parent:destroy(self)
 end
 
 -- Default callback functions
@@ -240,12 +244,33 @@ function GameScene:initialize(name, transform)
     self.name = name or 'GameScene'
     self.gameObjects = {}
     self.globals = {}
+    self.globals.scene = self
     GameScene.super.initialize(self, transform)
 end
 
 function GameScene:addGameObject(gameObject)
     assert(gameObject:isInstanceOf(GameObject), "Trying to add non-GameObject to the GameScene")
     table.insert(self.gameObjects, gameObject)
+end
+
+function GameScene:destroy(gameObject)
+    self.toDestroy = self.toDestroy or {}
+    table.insert(self.toDestroy, gameObject)
+end
+
+function GameScene:removeGameObject(gameObject)
+    local index = collections.index(self.gameObjects, gameObject)
+	if index then
+		table.remove(self.gameObjects, index)
+	end
+    local index2 = collections.index(self.children, gameObject)
+	if index2 then
+		table.remove(self.children, index2)
+	end
+
+	for k in pairs(gameObject) do
+		gameObject[k] = nil
+	end
 end
 
 
@@ -297,6 +322,10 @@ end
 
 function GameScene:update(dt)
     GameScene.super.update(self, dt)
+    for _, gameObject in ipairs(self.toDestroy or {}) do
+        self:removeGameObject(gameObject)
+    end
+    self.toDestroy = {}
 end
 
 function GameScene:draw()

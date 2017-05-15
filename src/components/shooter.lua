@@ -1,33 +1,30 @@
 local rope = require 'rope'
-local Bullet = require('components.bullet')
+local geometry = require 'rope.geometry'
+local Velocity = require 'components.velocity'
+local ImageRenderer = require 'rope.builtins.graphics.image_renderer'
+local DieOutOfScreen = require 'components.die_out_of_screen'
 
 
 local Component = rope.Component:subclass('Shooter')
 
 function Component:initialize(arguments)
     self:validate(arguments, 'bulletSpeed')
-    self.bullets = {}
+    arguments.shiftX = arguments.shiftX or 0
+    arguments.shiftY = arguments.shiftY or 0
     rope.Component.initialize(self, arguments)
 end
 
-function Component:update(dt)
-    for _, bullet in ipairs(self.bullets) do bullet:update(dt) end
-end
-
-function Component:draw()
-    for _, bullet in ipairs(self.bullets) do bullet:draw() end
-end
-
-function Component:addBullet(bullet)
-    table.insert(self.bullets, bullet)
-end
-
 function Component:shoot()
-    table.insert(self.bullets, Bullet(
-        self.gameObject.transform.position.x,
-        self.gameObject.transform.position.y,
-        self.bulletSpeed, 0
-    ))
+    local bulletObject = rope.GameObject(
+        self.gameObject.parent, 'Bullet',
+        geometry.Transform(
+            {x = self.gameObject.transform.position.x + self.shiftX,
+            y = self.gameObject.transform.position.y + self.shiftY}
+        )
+    )
+    bulletObject:addComponent(Velocity{vx=self.bulletSpeed})
+    bulletObject:addComponent(ImageRenderer{filename='static/img/bullet.png'})
+    bulletObject:addComponent(DieOutOfScreen())
 end
 
 return Component

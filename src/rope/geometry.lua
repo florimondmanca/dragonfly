@@ -47,7 +47,7 @@ function Vector.__mul(a, b)
     return Vector(scalar * vector.x, scalar * vector.y)
 end
 
-function Vector.__tostring()
+function Vector:__tostring()
     return string.format('{x=%.2f, y=%.2f}', self.x, self.y)
 end
 
