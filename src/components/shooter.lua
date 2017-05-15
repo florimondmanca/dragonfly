@@ -24,7 +24,7 @@ function Component:shoot()
         {filename=self.filename}
     )
     bulletObject:addComponent(
-        rope.loadComponent(('components.die_out_of_screen'))())
+        rope.loadComponent('components.die_out_of_screen')())
 end
 
 return Component
