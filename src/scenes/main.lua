@@ -29,6 +29,14 @@ return {
                     script = 'components.movement.input_motor_controller',
                     arguments = {axis='y', keyPlus='down', keyMinus='up'}
                 },
+                -- {
+                --     script = 'components.movement.physics_motor',
+                --     arguments = {axis='x', speed=100, drag=10},
+                -- },
+                -- {
+                --     script = 'components.movement.input_motor_controller',
+                --     arguments = {axis='x', keyPlus='right', keyMinus='left'}
+                -- },
                 -- shooting
                 {
                     script = 'components.shooter',
@@ -99,19 +107,6 @@ return {
                 x = 750,
                 y = love.graphics.getHeight()/2
             }},
-            components = {
-                {
-                    script = 'components.shooter',
-                    arguments = {
-                        bulletSpeed = -200,
-                        filename = 'static/img/bullet-left.png',
-                    }
-                },
-                {
-                    script = 'components.random_shooter_controller',
-                    arguments = {meanWaitTime = 3, waitTimeSigma = 1}
-                }
-            },
             prefab = 'prefabs.enemy1'
         }
     },

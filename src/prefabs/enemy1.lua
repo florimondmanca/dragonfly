@@ -13,6 +13,18 @@ return {
         {
             script = 'components.movement.random_chase_motor_controller',
             arguments = {axis = 'y', min = 0.15, max = 0.85}
+        },
+        -- shooting
+        {
+            script = 'components.shooter',
+            arguments = {
+                bulletSpeed = -200,
+                filename = 'static/img/bullet-left.png',
+            }
+        },
+        {
+            script = 'components.random_shoot_controller',
+            arguments = {meanWaitTime = 3, waitTimeSigma = 1}
         }
     }
 }

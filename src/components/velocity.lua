@@ -17,8 +17,7 @@ end
 function Component:update(dt)
     self.vx = self.vx + self.fx * dt
     self.vy = self.vy + self.fy * dt
-    self.gameObject.transform.position.x = self.gameObject.transform.position.x + self.vx * dt
-    self.gameObject.transform.position.y = self.gameObject.transform.position.y + self.vy * dt
+    self.gameObject:move(self.vx * dt, self.vy * dt)
     self.fx = 0
     self.fy = 0
 end

@@ -13,9 +13,9 @@ function Component:shoot()
     -- create a separated, independant bullet object in the scene
     local bulletObject = rope.GameObject(
         self.gameScene, 'Bullet', {position = {
-            x = self.gameObject.transform.position.x + self.shiftX,
-            y = self.gameObject.transform.position.y + self.shiftY}
-        }, self.gameObject
+            x = self.gameObject.globalTransform.position.x + self.shiftX,
+            y = self.gameObject.globalTransform.position.y + self.shiftY}
+        }
     )
     bulletObject:addComponent(
         rope.loadComponent('components.velocity'){vx=self.bulletSpeed}

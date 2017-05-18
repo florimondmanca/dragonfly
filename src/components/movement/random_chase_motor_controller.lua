@@ -7,10 +7,10 @@ local function newTargetPositionFunction(axis, min, max)
     local makeX = axis == 'x' and (function(self)
         return (min + (max - min) * love.math.random()) * love.graphics.getWidth()
     end) or (function(self)
-        return self.gameObject.transform.position.x
+        return self.gameObject.globalTransform.position.x
     end)
     local makeY = axis == 'x' and (function(self)
-        return self.gameObject.transform.position.y
+        return self.gameObject.globalTransform.position.y
     end) or (function(self)
         return (min + (max - min) * love.math.random()) * love.graphics.getHeight()
     end)
@@ -19,7 +19,7 @@ local function newTargetPositionFunction(axis, min, max)
             x = makeX(self),
             y = makeY(self),
         }
-        self.direction = (self.targetPos[axis] > self.gameObject.transform.position[axis]) and 1 or -1
+        self.direction = (self.targetPos[axis] > self.gameObject.globalTransform.position[axis]) and 1 or -1
     end
 end
 
@@ -34,7 +34,7 @@ function Component:initialize(arguments)
 end
 
 function Component:reachedTarget()
-    return self.direction * (self.gameObject.transform.position[self.axis] - self.targetPos[self.axis]) > 0
+    return self.direction * (self.gameObject.globalTransform.position[self.axis] - self.targetPos[self.axis]) > 0
 end
 
 function Component:update(dt)

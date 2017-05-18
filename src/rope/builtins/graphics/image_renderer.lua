@@ -9,8 +9,8 @@ function Component:initialize(arguments)
 end
 
 function Component:draw()
-    love.graphics.draw(self.image, self.gameObject.transform.position.x,
-    self.gameObject.transform.position.y)
+    local pos = self.gameObject.globalTransform.position
+    love.graphics.draw(self.image, pos.x, pos.y)
 end
 
 return Component
