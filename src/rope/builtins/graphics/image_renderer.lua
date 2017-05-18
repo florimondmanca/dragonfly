@@ -10,6 +10,7 @@ end
 
 function Component:draw()
     local pos = self.gameObject.globalTransform.position
+    love.graphics.setColor(255, 255, 255)
     love.graphics.draw(self.image, pos.x, pos.y)
 end
 
