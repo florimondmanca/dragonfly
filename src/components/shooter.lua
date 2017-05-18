@@ -10,8 +10,9 @@ function Component:initialize(arguments)
 end
 
 function Component:shoot()
+    -- create a separated, independant bullet object in the scene
     local bulletObject = rope.GameObject(
-        self.gameObject.parent, 'Bullet', {position = {
+        self.gameScene, 'Bullet', {position = {
             x = self.gameObject.transform.position.x + self.shiftX,
             y = self.gameObject.transform.position.y + self.shiftY}
         }

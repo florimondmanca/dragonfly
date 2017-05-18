@@ -14,6 +14,10 @@ function Component:initialize(arguments)
     end
 end
 
+function Component:awake()
+    -- callback, invoked any time a component is attached to a game object
+end
+
 function Component:validate(arguments, ...)
     arguments = arguments or {}
     for _, argName in ipairs{...} do
@@ -25,8 +29,9 @@ end
 
 function Component:setGameObject(gameObject)
     self.gameObject = gameObject
+    self.gameScene = gameObject.gameScene
     self.globals = gameObject.globals
-    if self.awake then self:awake() end
+    self:awake()
 end
 
 function Component:update() end
@@ -39,6 +44,41 @@ end
 
 
 -- [[ Game Entity ]] --
+
+local function maintainTransform(self)
+	-- maintains global position and rotation
+	--NOTE: only GameEntity:init() and GameEntity:update() should call this function directly
+
+	--clamp rotation between 0 and 360 degrees (e.g., -290 => 70)
+	self.transform.rotation = self.transform.rotation % 360
+
+	local t = self.transform
+	local p
+
+	if self.parent and next(self.parent) ~= nil then
+		p = self.parent.globalTransform
+	elseif self.gameScene and next(self.gameScene) ~= nil then
+		p = self.gameScene.transform
+	else
+		self.globalTransform = self.transform
+		return
+	end
+
+	self.globalTransform = geometry.Transform({
+		position = p.position,
+		size = geometry.Vector({
+			x = t.size.x * p.size.x,
+			y = t.size.y * p.size.y
+		}),
+		rotation = t.rotation + p.rotation
+	})
+
+	self.globalTransform.position = self.globalTransform.position + geometry.Vector({
+		x = t.position.x * p.size.x,
+		y = t.position.y * p.size.y
+	}):rotate(p.rotation)
+end
+
 
 local GameEntity = class('GameEntity')
 
@@ -53,10 +93,12 @@ function GameEntity:initialize(transform, parent)
     if parent then
         parent:addChild(self)
     end
+    maintainTransform(self)
 end
 
 function GameEntity:addChild(child, trackParent)
-    assert(child:isInstanceOf(GameEntity), 'child must be a GameEntity')
+    assert(child.isInstanceOf and child:isInstanceOf(GameEntity),
+        'child must be a GameEntity, it is: ' .. child.name)
     assert(child ~= self, 'circular reference: cannot add self as child')
 
     if trackParent == nil then trackParent = true end
@@ -70,10 +112,25 @@ function GameEntity:addChild(child, trackParent)
     if trackParent then child.parent = self end
 end
 
+function GameEntity:removeChild(child)
+	local index = collections.index(self.children, child)
+	if index then
+		table.remove(self.children, index)
+	end
+end
+
 function GameEntity:update(dt)
     for _, child in ipairs(self.children) do
         child:update(dt)
     end
+end
+
+function GameEntity:move(dx, dy)
+    self.transform.position = self.transform.position + geometry.Vector(dx, dy)
+end
+
+function GameEntity:moveTo(x, y)
+    self.transform.position = geometry.Vector(x, y)
 end
 
 -- Default callback functions
@@ -107,10 +164,18 @@ end
 
 local GameObject = GameEntity:subclass('GameObject')
 
-function GameObject:initialize(scene, name, transform)
+function GameObject:initialize(scene, name, transform, parent)
     self.globals = scene.globals
-    self.name = name
-    GameEntity.initialize(self, transform, scene)
+    self.name = name or ''
+    GameEntity.initialize(self, transform)
+    -- if given, parent must be a game object, else it is the scene
+    if parent then
+        assert(parent.isInstanceOf and parent:isInstanceOf(GameObject),
+        "parent must be GameObject, it is: " .. parent.name)
+        parent:addChild(self)
+    else
+        scene:addChild(self)
+    end
     self.components = {}
     scene:addGameObject(self)
 end
@@ -150,6 +215,16 @@ end
 
 function GameObject:getComponents(componentType, filter)
     return getComponents(self, componentType, nil, filter)
+end
+
+function GameObject:addChild(child)
+	--if child is at the top of the hierarchy, push it down
+	child.gameScene:removeChild(child)
+
+	if class.instanceof(child.parent, GameObject) then
+		child.parent:removeChild(child)
+	end
+	self.base.addChild(self, child)
 end
 
 function GameObject:destroy()
@@ -204,13 +279,16 @@ local function getPrefabComponents(object)
     for _, component in ipairs(prefabTable.components) do
         table.insert(components, component)
     end
-    if object.prefabComponents then
-        for _, component in ipairs(components) do
-            for _, overridden in ipairs(object.prefabComponents) do
-                if component.script == overridden.script then
-                    for k, v in pairs(overridden.arguments) do
-                        component.arguments[k] = v
-                    end
+
+    if not object.prefabComponents then
+        return components
+    end
+
+    for _, component in ipairs(components) do
+        for _, overridden in ipairs(object.prefabComponents) do
+            if component.script == overridden.script then
+                for k, v in pairs(overridden.arguments) do
+                    component.arguments[k] = v
                 end
             end
         end
@@ -219,11 +297,14 @@ local function getPrefabComponents(object)
 end
 
 local function buildObject(scene, object)
-    -- create the game object
-    local gameObject = GameObject(scene, object.name, object.transform)
+    -- create the game object and add it to the scene
+    local gameObject = GameObject(
+        scene, object.name, object.transform)
+
     -- get components from prefab if given
     if object.prefab then
-        assert(type(object.prefab) == 'string', 'Prefab must be a string')
+        assert(type(object.prefab) == 'string' and object.prefab ~= '',
+            'Prefab must be non-empty string')
         object.components = object.components or {}
         for _, component in ipairs(getPrefabComponents(object)) do
             table.insert(object.components, component)
@@ -236,6 +317,10 @@ local function buildObject(scene, object)
         componentClass:isSubclassOf(Component), 'Script ' .. component.script .. ' does not return a Component')
         gameObject:addComponent(componentClass(component.arguments or {}))
     end
+    -- add children
+    for _, child in ipairs(object.children or {}) do
+        gameObject:addChild(buildObject(scene, child))
+    end
     return gameObject
 end
 
@@ -245,12 +330,13 @@ function GameScene:initialize(name, transform)
     self.name = name or 'GameScene'
     self.gameObjects = {}
     self.globals = {}
-    self.globals.scene = self
     GameScene.super.initialize(self, transform)
 end
 
 function GameScene:addGameObject(gameObject)
-    assert(gameObject:isInstanceOf(GameObject), "Trying to add non-GameObject to the GameScene")
+    assert(gameObject.isInstanceOf and gameObject:isInstanceOf(GameObject),
+    "Can only add GameObject to a GameScene")
+    gameObject.gameScene = self
     table.insert(self.gameObjects, gameObject)
 end
 
@@ -317,7 +403,7 @@ function GameScene:load(src)
 
     -- load game objects
     for _, object in ipairs(src.gameObjects) do
-        buildObject(self, object)
+        buildObject(self, object, self)
     end
 end
 
