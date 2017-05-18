@@ -15,7 +15,7 @@ function Component:shoot()
         self.gameScene, 'Bullet', {position = {
             x = self.gameObject.transform.position.x + self.shiftX,
             y = self.gameObject.transform.position.y + self.shiftY}
-        }
+        }, self.gameObject
     )
     bulletObject:addComponent(
         rope.loadComponent('components.velocity'){vx=self.bulletSpeed}

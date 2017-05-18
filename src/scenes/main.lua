@@ -57,13 +57,13 @@ return {
                     }
                 },
             },
-            -- children = {
-            --     {
-            --         name = 'Some circle',
-            --         transform = {position = {x = 0, y = 100}},
-            --         prefab = 'prefabs.circle'
-            --     }
-            -- }
+            children = {
+                {
+                    name = 'Some circle',
+                    transform = {position = {x = 0, y = 100}},
+                    prefab = 'prefabs.circle'
+                }
+            }
         },
         {
             name = 'Enemy',

@@ -27,13 +27,6 @@ function Component:validate(arguments, ...)
     end
 end
 
-function Component:setGameObject(gameObject)
-    self.gameObject = gameObject
-    self.gameScene = gameObject.gameScene
-    self.globals = gameObject.globals
-    self:awake()
-end
-
 function Component:update() end
 
 local function loadComponent(filename)
@@ -89,7 +82,9 @@ function GameEntity:initialize(transform, parent)
     else
         self.transform = geometry.Transform(transform)
     end
+
     self.children = {}
+
     if parent then
         parent:addChild(self)
     end
@@ -112,7 +107,6 @@ function GameEntity:removeChild(child)
 	local index = collections.index(self.children, child)
 	if index then
 		table.remove(self.children, index)
-        print('removed', child.name, 'from', self.name)
 	end
 end
 
@@ -186,6 +180,7 @@ function GameObject:initialize(scene, name, transform, parent)
 end
 
 function GameObject:update(dt)
+    maintainTransform(self)
     for _, component in ipairs(self.components) do
         component:update(dt)
     end
@@ -198,18 +193,22 @@ function GameObject:draw()
     end
 end
 
-function GameObject:addComponent(component)
-    assert(component:isInstanceOf(Component), "Trying to add non-Component object to object's components")
-    table.insert(self.components, component)
-    component:setGameObject(self)
+function GameObject:addChild(child)
+	-- if child is at the top of the hierarchy, push it down
+	child.gameScene:removeChild(child)
+    -- remove child from its possible parent
+    if child.parent and child.parent:isInstanceOf(GameObject) then
+        child.parent:removeChild(child)
+    end
+	GameEntity.addChild(self, child)
 end
 
-function GameObject:removeComponent(componentClass)
-    for i, c in ipairs(self.components) do
-        if c:isInstanceOf(componentClass) then
-            return table.remove(self.components, i)
-        end
-    end
+function GameObject:addComponent(component)
+    table.insert(self.components, component)
+    component.gameObject = self
+    component.gameScene = self.gameScene
+    component.globals = self.gameScene.globals
+    component:awake()
 end
 
 function GameObject:getComponent(componentType, filter)
@@ -222,17 +221,13 @@ function GameObject:getComponents(componentType, filter)
     return getComponents(self, componentType, nil, filter)
 end
 
-function GameObject:addChild(child)
-	-- if child is at the top of the hierarchy, push it down
-	child.gameScene:removeChild(child)
-    -- remove child from its possible parent
-    if child.parent then
-        if child.parent:isInstanceOf(GameObject) then
-            child.parent:removeChild(child)
-        end
-    end
-	GameEntity.addChild(self, child)
-end
+-- function GameObject:removeComponent(componentClass)
+--     for i, c in ipairs(self.components) do
+--         if c:isInstanceOf(componentClass) then
+--             return table.remove(self.components, i)
+--         end
+--     end
+-- end
 
 function GameObject:destroy()
     self.gameScene:destroy(self)
@@ -337,44 +332,11 @@ function GameScene:initialize(name, transform)
     self.name = name or 'GameScene'
     self.gameObjects = {}
     self.globals = {}
-    GameScene.super.initialize(self, transform)
+    GameEntity.initialize(self, transform)
 end
-
-function GameScene:addGameObject(gameObject)
-    assert(gameObject.isInstanceOf and gameObject:isInstanceOf(GameObject),
-    "Can only add GameObject to a GameScene")
-    gameObject.gameScene = self
-    table.insert(self.gameObjects, gameObject)
-end
-
-function GameScene:destroy(gameObject)
-    self.toDestroy = self.toDestroy or {}
-    table.insert(self.toDestroy, gameObject)
-end
-
-function GameScene:removeGameObject(gameObject)
-    local index = collections.index(self.gameObjects, gameObject)
-	if index then
-		table.remove(self.gameObjects, index)
-	end
-    self:removeChild(gameObject)
-
-	for k in pairs(gameObject) do
-		gameObject[k] = nil
-	end
-end
-
 
 function GameScene:loadSettings(settingsFile)
     self.settings = createSettingsTable(love.filesystem.load(settingsFile)())
-end
-
-function GameScene:applySettings()
-    -- window
-    love.window.setMode(self.settings.window.width, self.settings.window.height)
-    love.window.setTitle(self.settings.window.title or 'Untitled')
-    -- graphics
-    love.graphics.setBackgroundColor(self.settings.graphics.backgroundColor)
 end
 
 function GameScene:load(src)
@@ -411,8 +373,42 @@ function GameScene:load(src)
     end
 end
 
+function GameScene:applySettings()
+    -- window
+    love.window.setMode(self.settings.window.width, self.settings.window.height)
+    love.window.setTitle(self.settings.window.title or 'Untitled')
+    -- graphics
+    love.graphics.setBackgroundColor(self.settings.graphics.backgroundColor)
+end
+
+function GameScene:addGameObject(gameObject)
+    assert(gameObject.isInstanceOf and gameObject:isInstanceOf(GameObject),
+    "Can only add GameObject to a GameScene")
+    gameObject.gameScene = self
+    table.insert(self.gameObjects, gameObject)
+end
+
+function GameScene:destroy(gameObject)
+    self.toDestroy = self.toDestroy or {}
+    table.insert(self.toDestroy, gameObject)
+end
+
+function GameScene:removeGameObject(gameObject)
+    local index = collections.index(self.gameObjects, gameObject)
+	if index then
+		table.remove(self.gameObjects, index)
+	end
+    self:removeChild(gameObject)
+
+	for k in pairs(gameObject) do
+		gameObject[k] = nil
+	end
+end
+
+
 function GameScene:update(dt)
-    GameScene.super.update(self, dt)
+    maintainTransform(self)
+    GameEntity.update(self, dt)
     for _, gameObject in ipairs(self.toDestroy or {}) do
         self:removeGameObject(gameObject)
     end
