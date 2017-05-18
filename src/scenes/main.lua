@@ -22,11 +22,11 @@ return {
                 },
                 -- motion control
                 {
-                    script = 'components.physics_motor',
+                    script = 'components.movement.physics_motor',
                     arguments = {axis='y', speed=200, drag=10},
                 },
                 {
-                    script = 'components.input_motor_controller',
+                    script = 'components.movement.input_motor_controller',
                     arguments = {axis='y', keyPlus='down', keyMinus='up'}
                 },
                 -- shooting
@@ -74,7 +74,7 @@ return {
             prefab = 'prefabs.enemy1',
             prefabComponents = {
                 {
-                    script = 'components.physics_motor',
+                    script = 'components.movement.physics_motor',
                     arguments = {speed = 70}
                 }
             }
@@ -88,7 +88,7 @@ return {
             prefab = 'prefabs.enemy1',
             prefabComponents = {
                 {
-                    script = 'components.physics_motor',
+                    script = 'components.movement.physics_motor',
                     arguments = {speed = 40}
                 }
             }

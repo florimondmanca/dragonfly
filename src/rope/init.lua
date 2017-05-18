@@ -103,11 +103,7 @@ function GameEntity:addChild(child, trackParent)
 
     if trackParent == nil then trackParent = true end
 
-    if self.children then
-        table.insert(self.children, child)
-    else
-        self.children = {child}
-    end
+    table.insert(self.children, child)
 
     if trackParent then child.parent = self end
 end
@@ -116,7 +112,16 @@ function GameEntity:removeChild(child)
 	local index = collections.index(self.children, child)
 	if index then
 		table.remove(self.children, index)
+        print('removed', child.name, 'from', self.name)
 	end
+end
+
+function GameEntity:printChildren(level)
+    level = level or 0
+    for _, child in ipairs(self.children) do
+        print('> ' .. string.rep('\t', level), child.name)
+        child:showChildren(level + 1)
+    end
 end
 
 function GameEntity:update(dt)
@@ -168,16 +173,16 @@ function GameObject:initialize(scene, name, transform, parent)
     self.globals = scene.globals
     self.name = name or ''
     GameEntity.initialize(self, transform)
+    scene:addGameObject(self)
     -- if given, parent must be a game object, else it is the scene
     if parent then
         assert(parent.isInstanceOf and parent:isInstanceOf(GameObject),
         "parent must be GameObject, it is: " .. parent.name)
         parent:addChild(self)
     else
-        scene:addChild(self)
+        scene:addChild(self, false)
     end
     self.components = {}
-    scene:addGameObject(self)
 end
 
 function GameObject:update(dt)
@@ -218,17 +223,19 @@ function GameObject:getComponents(componentType, filter)
 end
 
 function GameObject:addChild(child)
-	--if child is at the top of the hierarchy, push it down
+	-- if child is at the top of the hierarchy, push it down
 	child.gameScene:removeChild(child)
-
-	if class.instanceof(child.parent, GameObject) then
-		child.parent:removeChild(child)
-	end
-	self.base.addChild(self, child)
+    -- remove child from its possible parent
+    if child.parent then
+        if child.parent:isInstanceOf(GameObject) then
+            child.parent:removeChild(child)
+        end
+    end
+	GameEntity.addChild(self, child)
 end
 
 function GameObject:destroy()
-    self.parent:destroy(self)
+    self.gameScene:destroy(self)
 end
 
 -- Default callback functions
@@ -350,10 +357,7 @@ function GameScene:removeGameObject(gameObject)
 	if index then
 		table.remove(self.gameObjects, index)
 	end
-    local index2 = collections.index(self.children, gameObject)
-	if index2 then
-		table.remove(self.children, index2)
-	end
+    self:removeChild(gameObject)
 
 	for k in pairs(gameObject) do
 		gameObject[k] = nil
@@ -403,7 +407,7 @@ function GameScene:load(src)
 
     -- load game objects
     for _, object in ipairs(src.gameObjects) do
-        buildObject(self, object, self)
+        buildObject(self, object)
     end
 end
 
