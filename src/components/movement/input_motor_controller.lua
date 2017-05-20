@@ -3,7 +3,7 @@ local MotorController = require('components.base').MotorController
 local Component = MotorController:subclass('InputMotorController')
 
 function Component:initialize(arguments)
-    self:validate(arguments, 'keyPlus', 'keyMinus')
+    self:require(arguments, 'keyPlus', 'keyMinus')
     MotorController.initialize(self, arguments)
 end
 

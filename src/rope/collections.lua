@@ -1,8 +1,16 @@
---[[list functions]]
+---
+-- collections.lua
+-- useful collection manipulation functions.
+--
+-- @module collections
 
+
+--- finds first index of value in an ordered list
+-- @param list a list of values
+-- @param value a value to look the index of for
+-- @param keyfunc filtering function, must return a boolean (optional)
+-- @return the index if found, `nil` otherwise
 local function index(list, value, keyfunc)
-	--find first index of value in an ordered list
-
 	for i, entity in ipairs(list) do
 		if (keyfunc and keyfunc(entity) == value) or (not keyfunc and entity == value) then
 			return i
@@ -10,11 +18,14 @@ local function index(list, value, keyfunc)
 	end
 end
 
+--- finds all indexes of value in an ordered list
+-- @param list a list of values
+-- @param value a value to look for index of for
+-- @param keyfunc filtering function, must return a boolean (optional)
+-- @return a table of the indices if any found, `nil` otherwise
+-- @see index
 local function indices(list, value, keyfunc)
-	--find all indexes of value in an ordered list
-
 	local indexes = nil
-
 	for i, entity in ipairs(list) do
 		if (keyfunc and keyfunc(entity) == value) or (not keyfunc and entity == value) then
 			if not indexes then
@@ -28,8 +39,10 @@ local function indices(list, value, keyfunc)
 	return indexes
 end
 
+--- performs shallow copy of a table
+-- @param t the table
+-- @return a shallow copy of `t`
 local function copy(t)
-	--shallow copy
 
 	if type(t) == "table" then
 		local _copy = {}
@@ -44,12 +57,11 @@ local function copy(t)
 	end
 end
 
+--- performs a recursive deepcopy of a table
+-- warning : avoid using for very large/deep tables
+-- circular references will not be copied.
 local function deepcopy(t, found)
-	--recursive deepcopy (avoid using for very large/deep tables)
-	--circular references will not be copied
-
 	if type(t) == "table" then
-
 		if not found or not index(found, t) then
 			found = copy(found) or {}
 			found[#found + 1] = t
@@ -64,18 +76,6 @@ local function deepcopy(t, found)
 			print (index(found, t), t)
 			return nil
 		end
-
-		-- local _copy = {}
-
-		-- for k,v in pairs(t) do
-		-- 	if not index(found, v) then
-		-- 		found = copy(found)
-		-- 		found[#found + 1] = v
-		-- 		_copy[k] = deepcopy(v, found)
-		-- 	end
-		-- end
-
-		-- return _copy
 	else
 		return t
 	end

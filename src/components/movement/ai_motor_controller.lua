@@ -3,7 +3,7 @@ local MotorController = require('components.base').MotorController
 local Component = MotorController:subclass('AIMotorController')
 
 function Component:initialize(arguments)
-    self:validate(arguments, 'axis')
+    self:require(arguments, 'axis')
     arguments.threshold = math.exp(-(arguments.meanChangeTime or 1))
     arguments.direction = arguments.direction or 1
     MotorController.initialize(self, arguments)

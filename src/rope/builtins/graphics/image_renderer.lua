@@ -3,7 +3,7 @@ local rope = require 'rope'
 local Component = rope.Component:subclass('ImageRenderer')
 
 function Component:initialize(arguments)
-    self:validate(arguments, 'filename')
+    self:require(arguments, 'filename')
     arguments = {image = love.graphics.newImage(arguments.filename)}
     rope.Component.initialize(self, arguments)
 end

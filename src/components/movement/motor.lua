@@ -3,7 +3,7 @@ local rope = require('rope')
 local Component = rope.Component:subclass('Motor')
 
 function Component:initialize(arguments)
-    self:validate(arguments, 'axis', 'speed')
+    self:require(arguments, 'axis', 'speed')
     rope.Component.initialize(self, arguments)
 end
 

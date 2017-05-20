@@ -3,7 +3,7 @@ local rope = require 'rope'
 local Component = rope.Component:subclass('Shooter')
 
 function Component:initialize(arguments)
-    self:validate(arguments, 'bulletSpeed', 'filename')
+    self:require(arguments, 'bulletSpeed', 'filename')
     arguments.shiftX = arguments.shiftX or 0
     arguments.shiftY = arguments.shiftY or 0
     rope.Component.initialize(self, arguments)

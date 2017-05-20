@@ -3,7 +3,7 @@ local rope = require 'rope'
 local Component = rope.Component:subclass('CircleRenderer')
 
 function Component:initialize(arguments)
-    self:validate(arguments, 'radius')
+    self:require(arguments, 'radius')
     arguments.color = arguments.color or {0, 0, 0}
     arguments.mode = arguments.mode or 'fill'
     rope.Component.initialize(self, arguments)

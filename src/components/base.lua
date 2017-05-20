@@ -23,7 +23,7 @@ end
 local InputController = Controller:subclass('InputController')
 
 function InputController:initialize(arguments)
-    self:validate(arguments, 'axis')
+    self:require(arguments, 'axis')
     assert(arguments.axis == 'x' or arguments.axis == 'y', 'Unknown axis: ' .. arguments.axis)
     Controller.initialize(self, arguments)
 end

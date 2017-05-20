@@ -7,6 +7,7 @@ local collections = require 'rope.collections'
 
 local Component = class('Component')
 
+
 function Component:initialize(arguments)
     self.gameObject = nil
     for k, v in pairs(arguments or {}) do
@@ -14,11 +15,22 @@ function Component:initialize(arguments)
     end
 end
 
+
+--- callback function, invoked any time a component is attached to a game object.
 function Component:awake()
-    -- callback, invoked any time a component is attached to a game object
+    -- callback
 end
 
-function Component:validate(arguments, ...)
+
+--- use this to make a Component require certain arguments.
+-- Example :
+--    ```self:require(arguments, 'imageFilename', 'size')```
+-- This will raise an error if the arguments table of the component
+-- declaration does not include 'imageFilename' and 'size' fields.
+-- @param arguments a table of arguments.
+-- @param ... a varargs of strings.
+-- @raise error if any of the required arguments is missing.
+function Component:require(arguments, ...)
     arguments = arguments or {}
     for _, argName in ipairs{...} do
         if arguments[argName] == nil then
@@ -27,8 +39,14 @@ function Component:validate(arguments, ...)
     end
 end
 
+
+--- callback function, called once a frame to update the component.
+-- @param dt delta time as passed to love.update().
 function Component:update() end
 
+
+--- loads a component *class* from a filename.
+-- @param filename the filename to the component class.
 local function loadComponent(filename)
     local componentClass = require(filename)
     assert(componentClass, 'Could not find component at ' .. filename)
@@ -38,11 +56,10 @@ end
 
 -- [[ Game Entity ]] --
 
+--- maintains global position and rotation of a GameEntity.
+--NOTE: only GameEntity:init() and GameEntity:update() should call this function directly.
 local function maintainTransform(self)
-	-- maintains global position and rotation
-	--NOTE: only GameEntity:init() and GameEntity:update() should call this function directly
-
-	--clamp rotation between 0 and 360 degrees (e.g., -290 => 70)
+	-- clamp rotation between 0 and 360 degrees (e.g., -290 => 70)
 	self.transform.rotation = self.transform.rotation % 360
 
 	local t = self.transform
@@ -75,6 +92,10 @@ end
 
 local GameEntity = class('GameEntity')
 
+--- initializes an entity.
+-- @tparam Transform transform a Transform or a table in the form: `{position={x=, y=}, size={x=, y=}, rotation=}`.
+-- @param parent an optional parent for the entity.
+-- @see Transform
 function GameEntity:initialize(transform, parent)
     transform = transform or {}
     if transform.class == geometry.Transform then
@@ -91,6 +112,10 @@ function GameEntity:initialize(transform, parent)
     maintainTransform(self)
 end
 
+
+--- adds a child to an entity.
+-- @tparam GameEntity child
+-- @tparam bool trackParent if `true` (the default), assigns this entity is assigned to the child.parent field.
 function GameEntity:addChild(child, trackParent)
     assert(child.isInstanceOf and child:isInstanceOf(GameEntity),
         'child must be a GameEntity, it is: ' .. child.name)
@@ -103,6 +128,9 @@ function GameEntity:addChild(child, trackParent)
     if trackParent then child.parent = self end
 end
 
+
+--- removes a child from an entity (has no effect is child is not one of the entity's children).
+-- @tparam GameEntity child
 function GameEntity:removeChild(child)
 	local index = collections.index(self.children, child)
 	if index then
@@ -110,6 +138,7 @@ function GameEntity:removeChild(child)
 	end
 end
 
+--- recursively prints a view of the entity's child tree to the console.
 function GameEntity:printChildren(level)
     level = level or 0
     for _, child in ipairs(self.children) do
@@ -118,23 +147,35 @@ function GameEntity:printChildren(level)
     end
 end
 
+--- updates the entity and all its children.
+-- @param dt delta time as given by love.update().
 function GameEntity:update(dt)
     for _, child in ipairs(self.children) do
         child:update(dt)
     end
 end
 
+
+--- moves an entity.
+-- @param number dx
+-- @param number dy
 function GameEntity:move(dx, dy)
     self.transform.position = self.transform.position + geometry.Vector(dx, dy)
 end
 
+--- moves an entity to a specified position.
+-- @param number x
+-- @param number y
 function GameEntity:moveTo(x, y)
     self.transform.position = geometry.Vector(x, y)
 end
 
--- Default callback functions
-for _, f in ipairs{'keypressed', 'keyreleased', 'mousepressed', 'mousemoved',
-'mousereleased', 'quit', 'windowresize', 'visible'} do
+--- default callback functions for game entities.
+local ENTITIES_CALLBACKS = {
+    'keypressed', 'keyreleased', 'mousepressed', 'mousemoved',
+    'mousereleased', 'quit', 'windowresize', 'visible'
+}
+for _, f in ipairs(ENTITIES_CALLBACKS) do
     GameEntity[f] = function(self, ...)
         for _, child in ipairs(self.children) do
             child[f](child, ...)
@@ -145,6 +186,12 @@ end
 
 --[[ GameObject ]]--
 
+
+--- helper function for getting components of a game object.
+-- @tparam GameObject self
+-- @tparam Component componentType can also be a string refering to the component's module filename.
+-- @tparam number num number of components to find (no error raised if less than `num` components found).
+-- @tparam func filter optional filter function: f(component) -> true or false.
 local function getComponents(self, componentType, num, filter)
     filter = filter or function() return true end
     if type(componentType) == 'string' then
@@ -161,8 +208,14 @@ local function getComponents(self, componentType, num, filter)
     return found
 end
 
+
 local GameObject = GameEntity:subclass('GameObject')
 
+--- initializes a game object.
+-- @tparam GameScene scene
+-- @tparam string name the object's name (empty string if nil given).
+-- @tparam Transform transform the game object's transform.
+-- @tparam GameObject parent an optional parent to the game object.
 function GameObject:initialize(scene, name, transform, parent)
     self.globals = scene.globals
     self.name = name or ''
@@ -179,6 +232,8 @@ function GameObject:initialize(scene, name, transform, parent)
     self.components = {}
 end
 
+--- updates the game object, all its components and all its children.
+-- @param dt delta time as given by love.update().
 function GameObject:update(dt)
     maintainTransform(self)
     for _, component in ipairs(self.components) do
@@ -187,12 +242,15 @@ function GameObject:update(dt)
     GameEntity.update(self, dt)
 end
 
+--- draws the game object by calling draw() on all its components.
 function GameObject:draw()
     for _, component in ipairs(self.components) do
         if component.draw then component:draw() end
     end
 end
 
+--- adds a child to a game object.
+-- @param child
 function GameObject:addChild(child)
 	-- if child is at the top of the hierarchy, push it down
 	child.gameScene:removeChild(child)
@@ -203,6 +261,8 @@ function GameObject:addChild(child)
 	GameEntity.addChild(self, child)
 end
 
+--- adds a component to a game object.
+-- @tparam Component component
 function GameObject:addComponent(component)
     table.insert(self.components, component)
     component.gameObject = self
@@ -211,17 +271,23 @@ function GameObject:addComponent(component)
     component:awake()
 end
 
+--- gets one component of a game object based on its type.
+-- @tparam Component componentType the component's class or a string refering to the component's module filename.
+-- @tparam func filter optional filter function: f(component) -> true or false.
 function GameObject:getComponent(componentType, filter)
     return getComponents(self, componentType, 1, filter)[1] or
         error('No component ' .. tostring(componentType) .. ' found' ..
         (filter and ' with conditions ' .. tostring(filter) or ''))
 end
 
+--- gets all components of a game object of a given type.
+-- @tparam Component componentType the component's class or a string refering to the component's module filename.
+-- @tparam func filter optional filter function: f(component) -> true or false.
 function GameObject:getComponents(componentType, filter)
     return getComponents(self, componentType, nil, filter)
 end
 
--- function GameObject:removeComponent(componentClass)
+-- function GameObject:removeComponent(componentType)
 --     for i, c in ipairs(self.components) do
 --         if c:isInstanceOf(componentClass) then
 --             return table.remove(self.components, i)
@@ -229,13 +295,16 @@ end
 --     end
 -- end
 
+
+--- destroys a game object (it will safely be destroyed at the end of the current frame).
+-- @see GameScene.destroy
 function GameObject:destroy()
     self.gameScene:destroy(self)
 end
 
--- Default callback functions
-for _, f in ipairs{'keypressed', 'keyreleased', 'mousepressed', 'mousemoved',
-'mousereleased', 'quit', 'windowresize', 'visible'} do
+
+-- register default callback functions.
+for _, f in ipairs(ENTITIES_CALLBACKS) do
     GameObject[f] = function(self, ...)
         for _, component in ipairs(self.components) do
             if component[f] then component[f](component, ...) end
@@ -247,7 +316,9 @@ end
 
 -- [[ GameScene ]] --
 
--- Helpers
+--- merges a settings table and the defaults settings table.
+-- @tparam table settings
+-- @tparam table defaults the default settings.
 local function createSettingsTable(settings, defaults)
     settings = settings or {}
     defaults = defaults or require('rope.defaults')
@@ -275,6 +346,8 @@ local function createSettingsTable(settings, defaults)
     return settings
 end
 
+--- merges the object table representation's prefabComponents with its prefab's.
+-- @tparam table object a game object in its table representation.
 local function getPrefabComponents(object)
     local prefabTable = require(object.prefab)
     local components = {}
@@ -298,6 +371,9 @@ local function getPrefabComponents(object)
     return components
 end
 
+--- builds a game object from its table representation.
+-- @tparam GameScene scene
+-- @tparam table object a game object in its table representation.
 local function buildObject(scene, object)
     -- create the game object and add it to the scene
     local gameObject = GameObject(
@@ -326,8 +402,13 @@ local function buildObject(scene, object)
     return gameObject
 end
 
+
 local GameScene = GameEntity:subclass('GameScene')
 
+
+--- initializes a game scene
+-- @tparam string name the scene's name.
+-- @tparam Transform the scene's transform.
 function GameScene:initialize(name, transform)
     self.name = name or 'GameScene'
     self.gameObjects = {}
@@ -335,10 +416,29 @@ function GameScene:initialize(name, transform)
     GameEntity.initialize(self, transform)
 end
 
+--- loads settings from a file, creates the settings table from it and assign it to the scene's settings.
+-- @tparam string settingsFile
+-- @see createSettingsTable
 function GameScene:loadSettings(settingsFile)
     self.settings = createSettingsTable(love.filesystem.load(settingsFile)())
 end
 
+--- applies the settings to the game scene
+function GameScene:applySettings()
+    -- window
+    love.window.setMode(self.settings.window.width, self.settings.window.height)
+    love.window.setTitle(self.settings.window.title or 'Untitled')
+    -- graphics
+    love.graphics.setBackgroundColor(self.settings.graphics.backgroundColor)
+end
+
+--- loads a game scene from a scene file.
+-- if `nil` is given, it is assumed that settings have already been loaded
+-- thanks to loadSettings() and that these settings declare a firstScene field.
+-- a string refering to the source scene file can also be given.
+-- for maximum flexibility, a table representation of the scene can also be directly passed.
+-- @tparam string src
+-- @see GameScene.loadSettings
 function GameScene:load(src)
     local typeS = type(src)
     local source = ''
@@ -384,14 +484,8 @@ function GameScene:load(src)
     end
 end
 
-function GameScene:applySettings()
-    -- window
-    love.window.setMode(self.settings.window.width, self.settings.window.height)
-    love.window.setTitle(self.settings.window.title or 'Untitled')
-    -- graphics
-    love.graphics.setBackgroundColor(self.settings.graphics.backgroundColor)
-end
-
+--- adds a game object to the scene. The scene will then be accessible through the game object's `gameScene` attribute.
+-- @tparam GameObject gameObject
 function GameScene:addGameObject(gameObject)
     assert(gameObject.isInstanceOf and gameObject:isInstanceOf(GameObject),
     "Can only add GameObject to a GameScene")
@@ -399,11 +493,16 @@ function GameScene:addGameObject(gameObject)
     table.insert(self.gameObjects, gameObject)
 end
 
+
+--- destroys a game object from the scene (it will be removed from the game objects at the end of the current frame).
+-- @tparam gameObject
 function GameScene:destroy(gameObject)
     self.toDestroy = self.toDestroy or {}
     table.insert(self.toDestroy, gameObject)
 end
 
+--- removes a game object from the scene, as well as all its children (its component will also be removed).
+-- @tparam GameObject gameObject
 function GameScene:removeGameObject(gameObject)
     local index = collections.index(self.gameObjects, gameObject)
 	if index then
@@ -416,6 +515,10 @@ function GameScene:removeGameObject(gameObject)
 	end
 end
 
+--- updates the scene and all its game objects ;
+-- objects whose destroy() method has been called in the current frame will
+-- be destroyed at the end of this function.
+-- @tparam dt delta time as given by love.update()
 function GameScene:update(dt)
     maintainTransform(self)
     GameEntity.update(self, dt)
@@ -425,6 +528,7 @@ function GameScene:update(dt)
     self.toDestroy = {}
 end
 
+--- draws the game scene
 function GameScene:draw()
     self.camera:set()
     for _, object in ipairs(self.gameObjects) do
@@ -434,7 +538,6 @@ function GameScene:draw()
 end
 
 
----
 
 return {
     Component = Component,
