@@ -430,6 +430,9 @@ function GameScene:applySettings()
     love.window.setTitle(self.settings.window.title or 'Untitled')
     -- graphics
     love.graphics.setBackgroundColor(self.settings.graphics.backgroundColor)
+    if self.settings.graphics.defaultFont then
+        love.graphics.setNewFont(self.settings.graphics.defaultFont)
+    end
 end
 
 --- loads a game scene from a scene file.

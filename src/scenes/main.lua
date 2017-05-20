@@ -7,6 +7,15 @@ return {
             transform = {position = {x = 30, y = 30}},
             prefab = 'rope.builtins.prefabs.fps_renderer'
         },
+        {
+            name = 'Event Manager',
+            components = {
+                {
+                    script = 'rope.builtins.event.event_manager',
+                    arguments = {events = {'shoot'}}
+                },
+            }
+        },
         -- sprites
         {
             name = 'DragonFly',
@@ -51,11 +60,7 @@ return {
                 },
                 -- events
                 {
-                    script = 'rope.builtins.event.event_manager',
-                    arguments = {events = {'shoot'}}
-                },
-                {
-                    script = 'rope.builtins.event.trigger',
+                    script = 'rope.builtins.event.key_trigger',
                     arguments = {key = 'space', event = 'shoot'}
                 },
                 {
@@ -64,6 +69,17 @@ return {
                         event = 'shoot',
                         targetComponent = 'components.shooter',
                         targetFunction = 'shoot'
+                    }
+                },
+            },
+            children = {
+                {
+                    name = 'health',
+                    components = {
+                        {
+                            script = 'rope.builtins.graphics.text_renderer',
+                            arguments = {text='15 HP'}
+                        }
                     }
                 },
             },

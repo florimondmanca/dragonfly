@@ -8,7 +8,7 @@ return {
         -- motion control
         {
             script = 'components.movement.physics_motor',
-            arguments = {axis = 'y', speed = 50, drag = 3}
+            arguments = {axis = 'y', speed = 50, drag = 5}
         },
         {
             script = 'components.movement.random_chase_motor_controller',

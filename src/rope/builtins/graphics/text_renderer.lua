@@ -2,19 +2,10 @@ local rope = require 'rope'
 
 local Component = rope.Component:subclass('TextRenderer')
 
-function Component:initialize(arguments, events)
-    local size = arguments.fontsize or 12
-    -- build Font object
-    local font
-    if arguments.font then
-        font = love.graphics.newFont(arguments.font, size)
-    else
-        font = love.graphics.newFont(size)
-    end
-    -- build Text object
-    local text = love.graphics.newText(font)
-    if arguments.text then text.set(arguments.text) end
-    rope.Component.initialize(self, {text=text}, events)
+function Component:initialize(arguments)
+    local text = love.graphics.newText(love.graphics.getFont())
+    if arguments.text then text:set(arguments.text) end
+    rope.Component.initialize(self, {text=text})
 end
 
 function Component:setText(text)
@@ -22,7 +13,8 @@ function Component:setText(text)
 end
 
 function Component:draw()
-    love.graphics.draw(self.text, self.gameObject.transform.position.x, self.gameObject.transform.position.y)
+    local pos = self.gameObject.globalTransform.position
+    love.graphics.draw(self.text, pos.x, pos.y)
 end
 
 return Component

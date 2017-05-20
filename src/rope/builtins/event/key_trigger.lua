@@ -1,14 +1,14 @@
 local rope = require 'rope'
 
-local Trigger = rope.Component:subclass('Trigger')
+local KeyTrigger = rope.Component:subclass('KeyTrigger')
 
-function Trigger:initialize(arguments)
+function KeyTrigger:initialize(arguments)
     self.key = arguments.key or 'space'
     self.event = arguments.event or ''
     rope.Component.initialize(self)
 end
 
-function Trigger:keypressed(key)
+function KeyTrigger:keypressed(key)
     if key == self.key then
         local e = self.globals.events[self.event]
         assert(e, 'Trigger could not find event ' .. self.event)
@@ -16,4 +16,4 @@ function Trigger:keypressed(key)
     end
 end
 
-return Trigger
+return KeyTrigger

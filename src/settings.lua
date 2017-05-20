@@ -7,5 +7,6 @@ return {
     },
     graphics = {
         backgroundColor = {200, 200, 255},
+        defaultFont = 'static/font/pixelfont.ttf',
     },
 }
