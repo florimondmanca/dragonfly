@@ -1,14 +1,18 @@
-local ShootController = require('components.base').ShootController
+local rope = require 'rope'
 
-local Component = ShootController:subclass('RandomShootController')
+local Component = rope.Component:subclass('RandomShootController')
 
 function Component:initialize(arguments)
     self.shooter = nil
     arguments.meanWaitTime = arguments.meanWaitTime or 1
     arguments.waitTimeSigma = arguments.waitTimeSigma or 1
-    ShootController.initialize(self, arguments)
+    rope.Component.initialize(self, arguments)
     self.time = 0
     self.waitTime = self:makeWaitTime()
+end
+
+function Component:awake()
+    self.shooter = self.gameObject:getComponent('components.shooter')
 end
 
 function Component:makeWaitTime()
@@ -20,7 +24,7 @@ end
 function Component:update(dt)
     self.time = self.time + dt
     if self.time > self.waitTime then
-        self:getShooter():shoot()
+        self.shooter:shoot()
         self.time = 0
         self.waitTime = self:makeWaitTime()
     end
