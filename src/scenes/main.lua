@@ -1,11 +1,13 @@
 return {
     name = 'MainScene',
     gameObjects = {
+        -- utilities : cameras, info renderers...
         {
             name = 'FPS',
             transform = {position = {x = 30, y = 30}},
             prefab = 'rope.builtins.prefabs.fps_renderer'
         },
+        -- sprites
         {
             name = 'DragonFly',
             transform = {
@@ -65,13 +67,6 @@ return {
                     }
                 },
             },
-            children = {
-                {
-                    name = 'Circle',
-                    transform = {position = {x = 0, y = 0}},
-                    prefab = 'prefabs.circle'
-                }
-            }
         },
         {
             name = 'Enemy',

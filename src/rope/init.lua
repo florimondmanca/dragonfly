@@ -1,6 +1,5 @@
 local class = require 'rope.class'
 local geometry = require 'rope.geometry'
-local camera = require 'rope.camera'
 local collections = require 'rope.collections'
 
 
@@ -373,11 +372,15 @@ function GameScene:load(src)
         buildObject(self, object)
     end
 
-    -- setup camera
-    if src.camera then
-        camera:setPosition(src.camera.x, src.camera.y)
-        camera:setScale(src.camera.scaleX, src.camera.scaleY)
-        camera:rotate(src.camera.rotation)
+    -- if no camera was given in game objects, build a default camera
+    if not self.camera then
+        buildObject(self, {
+            name = 'Camera',
+            transform = {position = {x = 0, y = 0}},
+            components = {
+                {script = 'rope.builtins.camera.camera'}
+            }
+        })
     end
 end
 
@@ -423,11 +426,11 @@ function GameScene:update(dt)
 end
 
 function GameScene:draw()
-    camera:set()
+    self.camera:set()
     for _, object in ipairs(self.gameObjects) do
         object:draw()
     end
-    camera:unset()
+    self.camera:unset()
 end
 
 
@@ -438,5 +441,4 @@ return {
     GameObject = GameObject,
     GameScene = GameScene,
     loadComponent = loadComponent,
-    camera = camera,
 }
