@@ -3,10 +3,6 @@ local rope = require 'rope'
 -- Tag Component for cameras
 local Camera = rope.Component:subclass('Camera')
 
-function Camera:initialize()
-    rope.Component.initialize(self)
-end
-
 function Camera:awake()
     -- add set() and unset() methods to Camera gameObject
     self.gameObject.set = function(self)
