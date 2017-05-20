@@ -12,7 +12,11 @@ return {
         },
         {
             script = 'components.movement.random_chase_motor_controller',
-            arguments = {axis = 'y', min = 0.15, max = 0.85}
+            arguments = {
+                axis = 'y',
+                min = 0.15, max = 0.85,
+                motor_script = 'components.movement.physics_motor'
+            }
         },
         -- shooting
         {

@@ -1,6 +1,6 @@
-local rope = require 'rope'
+local MotorController = require('components.base').MotorController
 
-local Component = rope.Component:subclass('RandomChaseMotorController')
+local Component = MotorController:subclass('RandomChaseMotorController')
 
 
 local function randomRange(min, max)
@@ -12,19 +12,17 @@ end
 -- the wandering effect is achieved by going to randomly generated target
 -- positions
 function Component:initialize(arguments)
-    self:require(arguments, 'axis')
-    assert(arguments.axis == 'x' or arguments.axis == 'y', 'Unknown axis: ' .. arguments.axis)
     -- min and max allow to limit the amplitude of movement of the
     -- sprite on the screen (0 <= min, max <= 1)
     arguments.min = arguments.min or 0
     arguments.max = arguments.max or 1
-    self.motor = nil
-    rope.Component.initialize(self, arguments)
+    MotorController.initialize(self, arguments)
     self.random = randomRange(arguments.min, arguments.max)
 end
 
 function Component:awake()
     self:newTarget()
+    MotorController.awake(self)
 end
 
 function Component:newTarget()
@@ -47,14 +45,9 @@ function Component:reachedTarget()
 end
 
 function Component:update(dt)
-    if self.motor then
-        self.motor:move(self.direction, dt)
-        if self:reachedTarget() then
-            self:newTarget()
-        end
-    else
-        self.motor = self.gameObject:getComponent('components.movement.motor',
-        function(c) return c.axis == self.axis end)
+    self.motor:move(self.direction, dt)
+    if self:reachedTarget() then
+        self:newTarget()
     end
 end
 

@@ -19,24 +19,17 @@ function Controller:getSlave(slaveClassPath, filter)
     return self.controlledComponent
 end
 
+local MotorController = rope.Component:subclass('MotorController')
 
-local InputController = Controller:subclass('InputController')
-
-function InputController:initialize(arguments)
-    self:require(arguments, 'axis')
-    assert(arguments.axis == 'x' or arguments.axis == 'y', 'Unknown axis: ' .. arguments.axis)
-    Controller.initialize(self, arguments)
+function MotorController:initialize(arguments)
+    self:require(arguments, 'axis', 'motor_script')
+    assert(arguments.axis == 'x' or arguments.axis == 'y',
+        'Unknown axis: ' .. arguments.axis)
+    rope.Component.initialize(self, arguments)
 end
 
--- [[ Concrete controllers ]] --
-
-
--- Motor Controller
-
-local MotorController = InputController:subclass('MotorController')
-
-function MotorController:getMotor()
-    return self:getSlave('components.movement.motor', function(c) return c.axis == self.axis end)
+function MotorController:awake()
+    self.motor = self.gameObject:getComponent(self.motor_script, function(c) return c.axis == self.axis end)
 end
 
 -- Shoot Controller

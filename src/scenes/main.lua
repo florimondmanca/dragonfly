@@ -38,7 +38,11 @@ return {
                 },
                 {
                     script = 'components.movement.input_motor_controller',
-                    arguments = {axis='y', keyPlus='down', keyMinus='up'}
+                    arguments = {
+                        axis='y',
+                        keyPlus='down', keyMinus='up',
+                        motor_script = 'components.movement.physics_motor'
+                    }
                 },
                 -- {
                 --     script = 'components.movement.physics_motor',
