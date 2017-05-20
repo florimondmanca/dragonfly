@@ -67,8 +67,8 @@ return {
             },
             children = {
                 {
-                    name = 'Some circle',
-                    transform = {position = {x = 0, y = 100}},
+                    name = 'Circle',
+                    transform = {position = {x = 0, y = 0}},
                     prefab = 'prefabs.circle'
                 }
             }

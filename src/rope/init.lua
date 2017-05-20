@@ -1,5 +1,6 @@
 local class = require 'rope.class'
 local geometry = require 'rope.geometry'
+local camera = require 'rope.camera'
 local collections = require 'rope.collections'
 
 
@@ -371,6 +372,13 @@ function GameScene:load(src)
     for _, object in ipairs(src.gameObjects) do
         buildObject(self, object)
     end
+
+    -- setup camera
+    if src.camera then
+        camera:setPosition(src.camera.x, src.camera.y)
+        camera:setScale(src.camera.scaleX, src.camera.scaleY)
+        camera:rotate(src.camera.rotation)
+    end
 end
 
 function GameScene:applySettings()
@@ -405,7 +413,6 @@ function GameScene:removeGameObject(gameObject)
 	end
 end
 
-
 function GameScene:update(dt)
     maintainTransform(self)
     GameEntity.update(self, dt)
@@ -416,9 +423,11 @@ function GameScene:update(dt)
 end
 
 function GameScene:draw()
+    camera:set()
     for _, object in ipairs(self.gameObjects) do
         object:draw()
     end
+    camera:unset()
 end
 
 
@@ -428,5 +437,6 @@ return {
     Component = Component,
     GameObject = GameObject,
     GameScene = GameScene,
-    loadComponent = loadComponent
+    loadComponent = loadComponent,
+    camera = camera,
 }
