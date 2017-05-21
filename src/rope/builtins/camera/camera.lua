@@ -5,7 +5,8 @@ local Camera = rope.Component:subclass('Camera')
 
 -- add all useful functions on awake
 function Camera:awake()
-    -- set() is called before all draws, it manages rotation and scaling
+    -- set() must be called before all draws,
+    -- it manages rotation and scaling
     self.gameObject.set = function(self)
         local r = self.globalTransform.rotation
         local scale = self.globalTransform.size
@@ -18,18 +19,19 @@ function Camera:awake()
         local pos = self.globalTransform.position
         target:move(-pos.x, -pos.y)
     end
-    -- add unset() method to Camera gameObject
+    -- unset() must be called after all draws
     self.gameObject.unset = function(self)
         love.graphics.pop()
     end
-    -- add mousePosition() method to Camera gameObject
+    -- mousePosition() gives the mouse position from the camera's point of view
     self.gameObject.mousePosition = function(self)
         local pos = self.globalTransform.position
         local scale = self.globalTransform.size
         return love.mouse.getX() * scale.x + pos.x, love.mouse.getY() * scale.y + pos.y
     end
-    -- add screenBoundaries() method to Camera gameObject
-    self.gameObject.screenBoundaries = function(self)
+    -- boundaries() gives top, left, right and bottom values of camera's
+    -- viewport
+    self.gameObject.boundaries = function(self)
         local pos = self.globalTransform.position
         local dx, dy = pos.x, pos.y
         local left, right = dx, dx + love.graphics.getWidth()

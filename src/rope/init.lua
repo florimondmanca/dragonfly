@@ -310,6 +310,7 @@ function GameObject:addComponent(component)
     component.gameScene = self.gameScene
     component.globals = self.gameScene.globals
     component:awake()
+    return component
 end
 
 --- gets one component of a game object based on its type.

@@ -20,12 +20,4 @@ function Component:awake()
     end
 end
 
-function Component:draw(debug)
-    if debug then
-        local pos = self.gameObject.globalTransform.position
-        love.graphics.setColor(255, 255, 255)
-        love.graphics.rectangle('line', pos.x, pos.y, self.width, self.height)
-    end
-end
-
 return Component

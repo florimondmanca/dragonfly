@@ -9,7 +9,7 @@ function Component:initialize(arguments)
     rope.Component.initialize(self, arguments)
 end
 
--- add all useful functions on awake
+-- set cameraFunc to move the camera on axis at speed
 function Component:awake()
     local onX, onY = self.axis == 'x' and 1 or 0, self.axis == 'y' and 1 or 0
     self.gameObject.cameraFunc = function(camera, _, dt)

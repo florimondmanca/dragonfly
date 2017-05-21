@@ -34,8 +34,12 @@ function Component:shoot()
         }, bulletObject
     )
     bulletObject:addChild(rectangle)
-    rectangle:addComponent(
+    local collider = rectangle:addComponent(
         rope.loadComponent('rope.builtins.collision.rectangle'){sizeFromImage = true}
+    )
+    rectangle:addComponent(
+        rope.loadComponent('rope.builtins.graphics.rectangle_renderer')
+        {width = collider.width, height = collider.height, mode = 'line', isDebug = true}
     )
 end
 

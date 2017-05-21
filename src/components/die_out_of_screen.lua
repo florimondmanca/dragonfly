@@ -3,7 +3,7 @@ local rope = require 'rope'
 local Component = rope.Component:subclass('DieOutOfScreen')
 
 function Component:update()
-    local boundaries = self.gameScene.camera:screenBoundaries()
+    local boundaries = self.gameScene.camera:boundaries()
     local pos = self.gameObject.globalTransform.position
     local x, y = pos.x, pos.y
     if x < boundaries.left or x > boundaries.right or
