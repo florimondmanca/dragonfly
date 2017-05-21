@@ -7,6 +7,7 @@ function Component:initialize(arguments)
         self:require(arguments, 'width', 'height')
         arguments.sizeFromImage = false
     end
+    self:require(arguments, 'collideGroup')
     rope.Component.initialize(self, arguments)
 end
 

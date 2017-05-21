@@ -22,11 +22,8 @@ function Trigger:update()
                 local e = self.globals.events[self.event]
                 assert(e, 'Trigger could not find event ' .. self.event ..
                 '. Was it declared in an EventManager game object?')
-                print('collision between', self.gameObject.name, 'and', gameObject.name)
                 -- send gameObject as the one that caused the collision
-                e:trigger({gameObject={
-                    left=self.gameObject, right=gameObject
-                }})
+                e:trigger({gameObject={me=self.gameObject, them=gameObject}})
             end
         end
     end

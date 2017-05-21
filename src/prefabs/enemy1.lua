@@ -8,7 +8,7 @@ return {
         -- motion control
         {
             script = 'components.movement.physics_motor',
-            arguments = {axis = 'y', speed = 50, drag = 5}
+            arguments = {axis = 'y', speed = 150, drag = 5}
         },
         {
             script = 'components.movement.random_chase_motor_controller',
@@ -29,6 +29,43 @@ return {
         {
             script = 'components.random_shoot_controller',
             arguments = {meanWaitTime = 3, waitTimeSigma = 1}
-        }
+        },
+        -- make sensible to collisions by adding an AABB
+        {
+            script = 'rope.builtins.collision.aabb',
+            arguments = {
+                collideGroup = 'enemy',
+                sizeFromImage = true
+            }
+        },
+        {
+            script = 'components.collision.destroy_on_collide',
+            arguments = {
+                onCollideWithGroup = {
+                    bullet = {destroySelf = true, destroyOther = true}
+                }
+            }
+        },
+        {
+            script = 'rope.builtins.graphics.rectangle_renderer',
+            arguments = {
+                sizeFromImage = true,
+                mode = 'line',
+                isDebug = true
+            }
+        },
+        -- catch collision events
+        {
+            script = 'rope.builtins.event.collision_trigger',
+            arguments = {event = 'collision'}
+        },
+        {
+            script = 'rope.builtins.event.event_listener',
+            arguments = {
+                event = 'collision',
+                targetComponent = 'rope.builtins.collision.aabb',
+                targetFunction = 'resolve'
+            }
+        },
     }
 }

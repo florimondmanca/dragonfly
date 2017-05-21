@@ -35,7 +35,7 @@ return {
                 -- motion control
                 {
                     script = 'components.movement.physics_motor',
-                    arguments = {axis='y', speed=100, drag=10},
+                    arguments = {axis='y', speed=200, drag=10},
                 },
                 {
                     script = 'components.movement.input_motor_controller',
@@ -47,7 +47,7 @@ return {
                 },
                 {
                     script = 'components.movement.physics_motor',
-                    arguments = {axis='x', speed=100, drag=10},
+                    arguments = {axis='x', speed=50, drag=10},
                 },
                 {
                     script = 'components.movement.input_motor_controller',
@@ -103,12 +103,6 @@ return {
                 y = love.graphics.getHeight()/2
             }},
             prefab = 'prefabs.enemy1',
-            prefabComponents = {
-                {
-                    script = 'components.movement.physics_motor',
-                    arguments = {speed = 70}
-                }
-            }
         },
         {
             name = 'Enemy',
@@ -117,12 +111,6 @@ return {
                 y = love.graphics.getHeight()/2
             }},
             prefab = 'prefabs.enemy1',
-            prefabComponents = {
-                {
-                    script = 'components.movement.physics_motor',
-                    arguments = {speed = 40}
-                }
-            }
         },
         {
             name = 'Enemy',

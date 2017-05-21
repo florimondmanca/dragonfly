@@ -12,9 +12,11 @@ return {
         -- collision AABB
         {
             script = 'rope.builtins.collision.aabb',
-            arguments = {sizeFromImage = true}
+            arguments = {
+                collideGroup = 'bullet',
+                sizeFromImage = true
+            }
         },
-        {script = 'components.collision.destroy_on_collide'},
         {
             script = 'rope.builtins.graphics.rectangle_renderer',
             arguments = {
