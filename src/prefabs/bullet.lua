@@ -25,18 +25,5 @@ return {
                 isDebug = true
             }
         },
-        -- collision events
-        {
-            script = 'rope.builtins.event.collision_trigger',
-            arguments = {event = 'collision'}
-        },
-        {
-            script = 'rope.builtins.event.event_listener',
-            arguments = {
-                event = 'collision',
-                targetComponent = 'rope.builtins.collision.aabb',
-                targetFunction = 'resolve'
-            }
-        },
     }
 }

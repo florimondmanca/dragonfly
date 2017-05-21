@@ -13,7 +13,7 @@ function Component:awake()
     local onCollideWithGroup = self.onCollideWithGroup
     local collider = self.gameObject:getComponent(AABB_SCRIPT)
 
-    local function resolve(self, objects)
+    collider.resolve = function (self, objects)
         local me, them = objects.me, objects.them
         -- if the other object was created by myself (e.g. a bullet)
         -- then don't destroy anyone!
@@ -28,8 +28,6 @@ function Component:awake()
             if onCollide.destroyOther then them:destroy() end
         end
     end
-
-    collider.resolve = resolve
 end
 
 return Component
