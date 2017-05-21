@@ -246,9 +246,9 @@ function GameObject:update(dt, firstUpdate)
 end
 
 --- draws the game object by calling draw() on all its components.
-function GameObject:draw()
+function GameObject:draw(debug)
     for _, component in ipairs(self.components) do
-        if component.draw then component:draw() end
+        if component.draw then component:draw(debug) end
     end
 end
 
@@ -475,7 +475,9 @@ function GameScene:load(src)
 
     -- load game objects
     for _, object in ipairs(src.gameObjects) do
-        buildObject(self, object)
+        if self.settings.debug or not object.isDebug then
+            buildObject(self, object)
+        end
     end
 
     -- if no camera was given in game objects, build a default camera
@@ -542,7 +544,7 @@ end
 function GameScene:draw()
     self.camera:set()
     for _, object in ipairs(self.gameObjects) do
-        object:draw()
+        object:draw(self.settings.debug)
     end
     self.camera:unset()
 end

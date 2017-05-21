@@ -5,7 +5,8 @@ return {
         {
             name = 'FPS',
             transform = {position = {x = 30, y = 30}},
-            prefab = 'rope.builtins.prefabs.fps_renderer'
+            prefab = 'rope.builtins.prefabs.fps_renderer',
+            isDebug = true
         },
         {
             name = 'Event Manager',
@@ -60,6 +61,18 @@ return {
                     arguments = {
                         axis='y',
                         keyPlus='down', keyMinus='up',
+                        motor_script = 'components.movement.physics_motor'
+                    }
+                },
+                {
+                    script = 'components.movement.physics_motor',
+                    arguments = {axis='x', speed=100, drag=10},
+                },
+                {
+                    script = 'components.movement.input_motor_controller',
+                    arguments = {
+                        axis='x',
+                        keyPlus='right', keyMinus='left',
                         motor_script = 'components.movement.physics_motor'
                     }
                 },

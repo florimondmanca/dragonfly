@@ -51,4 +51,17 @@ function Component:update(dt)
     end
 end
 
+function Component:draw(debug)
+    if debug then
+        love.graphics.setColor(255, 255, 255)
+        if self.axis == 'x' then
+            local y = self.gameObject.globalTransform.position.y
+            love.graphics.line(self.min * love.graphics.getWidth(), y, self.max * love.graphics.getWidth(), y)
+        elseif self.axis == 'y' then
+            local x = self.gameObject.globalTransform.position.x
+            love.graphics.line(x, self.min * love.graphics.getHeight(), x, self.max * love.graphics.getHeight())
+        end
+    end
+end
+
 return Component

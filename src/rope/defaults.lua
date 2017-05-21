@@ -6,5 +6,6 @@ return {
     },
     graphics = {
         backgroundColor = {255, 255, 255},
-    }
+    },
+    debug = false,
 }

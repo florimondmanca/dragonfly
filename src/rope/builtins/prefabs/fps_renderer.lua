@@ -11,5 +11,5 @@ return {
         {
             script = 'rope.builtins.camera.link'
         },
-    }
+    },
 }
