@@ -13,7 +13,7 @@ return {
             components = {
                 {
                     script = 'rope.builtins.event.event_manager',
-                    arguments = {events = {'shoot'}}
+                    arguments = {events = {'shoot', 'collision'}}
                 },
             },
         },

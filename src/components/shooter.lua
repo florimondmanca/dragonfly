@@ -17,30 +17,63 @@ function Component:shoot()
             y = self.gameObject.globalTransform.position.y + self.shiftY}
         }
     )
-    bulletObject:addComponent(
-        rope.loadComponent('components.velocity'){vx=self.bulletSpeed}
-    )
-    bulletObject:addComponent(
-        rope.loadComponent('rope.builtins.graphics.image_renderer')
-        {filename=self.filename}
-    )
-    bulletObject:addComponent(
-        rope.loadComponent('components.die_out_of_screen')()
-    )
-    -- add a rectangle to bullet for collision detection
-    local rectangle = rope.GameObject(
-        self.gameScene, 'Bullet rectangle', {position = {
+    local components = {
+        {
+            script = 'components.velocity',
+            arguments = {vx = self.bulletSpeed},
+        },
+        {
+            script = 'rope.builtins.graphics.image_renderer',
+            arguments = {filename = self.filename}
+        },
+        {script = 'components.die_out_of_screen'},
+    }
+    for _, component in ipairs(components) do
+        bulletObject:buildAndAddComponent(component)
+    end
+    -- add an AABB to bullet for collision detection
+    local aabb = rope.GameObject(
+        self.gameScene, 'Bullet AABB', {position = {
             x = 0, y = 0}
         }, bulletObject
     )
-    bulletObject:addChild(rectangle)
-    local collider = rectangle:addComponent(
-        rope.loadComponent('rope.builtins.collision.rectangle'){sizeFromImage = true}
-    )
-    rectangle:addComponent(
-        rope.loadComponent('rope.builtins.graphics.rectangle_renderer')
-        {width = collider.width, height = collider.height, mode = 'line', isDebug = true}
-    )
+    bulletObject:addChild(aabb)
+    -- add an AABB tag component to AABB game object
+    local collider = aabb:buildAndAddComponent({
+        script = 'rope.builtins.collision.aabb',
+        arguments = {sizeFromImage = true}
+    })
+    collider.resolve = function(self, other)
+        self.gameObject:destroy()
+        other:destroy()
+    end
+    aabb:buildAndAddComponent({
+        script = 'rope.builtins.graphics.rectangle_renderer',
+        arguments = {
+            width = collider.width,
+            height = collider.height,
+            mode = 'line',
+            isDebug = true
+        }
+    })
+    -- register a collision event on the bullet's AABB
+    local eventComponents = {
+        {
+            script = 'components.event.collision_trigger',
+            arguments = {event = 'collision'}
+        },
+        {
+            script = 'rope.builtins.event.event_listener',
+            arguments = {
+                event = 'collision',
+                targetComponent = 'rope.builtins.collision.aabb',
+                targetFunction = 'resolve'
+            }
+        },
+    }
+    for _, component in ipairs(eventComponents) do
+        aabb:buildAndAddComponent(component)
+    end
 end
 
 return Component

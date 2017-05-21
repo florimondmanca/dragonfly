@@ -1,7 +1,6 @@
 local rope = require 'rope'
-local collision = require 'rope.collision'
 
-local Component = rope.Component:subclass('Rectangle')
+local Component = rope.Component:subclass('AABB')
 
 function Component:initialize(arguments)
     if not arguments.sizeFromImage then
@@ -18,6 +17,19 @@ function Component:awake()
         self.width = image:getWidth()
         self.height = image:getHeight()
     end
+end
+
+--- resolves a collision between the owner game object and another game object.
+-- callback function: does nothing by default.
+-- @tparam GameObject other
+function Component:resolve()
+    print('resolve!')
+    -- callback function
+end
+
+function Component:getAABB()
+    local pos = self.gameObject.globalTransform.position
+    return {x = pos.x, y = pos.y, w = self.width, h = self.height}
 end
 
 return Component
