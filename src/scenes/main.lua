@@ -34,7 +34,7 @@ return {
                 -- motion control
                 {
                     script = 'components.movement.physics_motor',
-                    arguments = {axis='y', speed=200, drag=10},
+                    arguments = {axis='y', speed=100, drag=10},
                 },
                 {
                     script = 'components.movement.input_motor_controller',
@@ -44,14 +44,19 @@ return {
                         motor_script = 'components.movement.physics_motor'
                     }
                 },
-                -- {
-                --     script = 'components.movement.physics_motor',
-                --     arguments = {axis='x', speed=100, drag=10},
-                -- },
-                -- {
-                --     script = 'components.movement.input_motor_controller',
-                --     arguments = {axis='x', keyPlus='right', keyMinus='left'}
-                -- },
+                -- constant speed to the right
+                {
+                    script = 'components.movement.motor',
+                    arguments = {axis = 'x', speed = 20}
+                },
+                {
+                    script = 'components.movement.constant_speed_motor_controller',
+                    arguments = {
+                        axis = 'x',
+                        motor_script = 'components.movement.motor',
+                        direction = 1
+                    }
+                },
                 -- shooting
                 {
                     script = 'components.shooter',
@@ -84,6 +89,16 @@ return {
                             script = 'rope.builtins.graphics.text_renderer',
                             arguments = {text='15 HP'}
                         }
+                    }
+                },
+                {
+                    name = 'Camera',
+                    components = {
+                        {script = 'rope.builtins.camera.camera'},
+                        {
+                            script = 'rope.builtins.camera.preserve_parent_location',
+                            arguments = {onX = true}
+                        },
                     }
                 },
             },

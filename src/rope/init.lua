@@ -42,6 +42,7 @@ end
 
 --- callback function, called once a frame to update the component.
 -- @param dt delta time as passed to love.update().
+-- @tparam bool firstUpdate true on the very first frame update
 function Component:update() end
 
 
@@ -149,9 +150,10 @@ end
 
 --- updates the entity and all its children.
 -- @param dt delta time as given by love.update().
-function GameEntity:update(dt)
+-- @tparam bool firstUpdate true on the first frame update
+function GameEntity:update(dt, firstUpdate)
     for _, child in ipairs(self.children) do
-        child:update(dt)
+        child:update(dt, firstUpdate)
     end
 end
 
@@ -234,12 +236,13 @@ end
 
 --- updates the game object, all its components and all its children.
 -- @param dt delta time as given by love.update().
-function GameObject:update(dt)
+-- @tparam bool firstUpdate true on the first frame update
+function GameObject:update(dt, firstUpdate)
     maintainTransform(self)
     for _, component in ipairs(self.components) do
-        component:update(dt)
+        component:update(dt, firstUpdate)
     end
-    GameEntity.update(self, dt)
+    GameEntity.update(self, dt, firstUpdate)
 end
 
 --- draws the game object by calling draw() on all its components.
@@ -378,7 +381,6 @@ local function buildObject(scene, object)
     -- create the game object and add it to the scene
     local gameObject = GameObject(
         scene, object.name, object.transform)
-
     -- get components from prefab if given
     if object.prefab then
         assert(type(object.prefab) == 'string' and object.prefab ~= '',
@@ -413,6 +415,7 @@ function GameScene:initialize(name, transform)
     self.name = name or 'GameScene'
     self.gameObjects = {}
     self.globals = {}
+    self.finishedFirstUpdate = false
     GameEntity.initialize(self, transform)
 end
 
@@ -521,14 +524,18 @@ end
 --- updates the scene and all its game objects ;
 -- objects whose destroy() method has been called in the current frame will
 -- be destroyed at the end of this function.
--- @tparam dt delta time as given by love.update()
+-- @param dt delta time as given by love.update()
+-- @tparam bool firstUpdate true on the first frame update
 function GameScene:update(dt)
     maintainTransform(self)
-    GameEntity.update(self, dt)
+    GameEntity.update(self, dt, not self.finishedFirstUpdate)
     for _, gameObject in ipairs(self.toDestroy or {}) do
         self:removeGameObject(gameObject)
     end
     self.toDestroy = {}
+    if not self.finishedFirstUpdate then
+        self.finishedFirstUpdate = true
+    end
 end
 
 --- draws the game scene
