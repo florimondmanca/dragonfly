@@ -2,6 +2,62 @@ local rope = require 'rope'
 local class = require 'rope.class'
 
 
+-- --------------
+-- -- QuadTree --
+-- --------------
+--
+-- local QuadTree = class('QuadTree')
+-- QuadTree.static.DEFAULT_MAX_OBJECTS = 10
+-- QuadTree.static.DEFAULT_MAX_LEVEL = 5
+-- QuadTree.static.CHILD_NODES = 4
+-- QuadTree.static.CHILD_NODES_SQRT = 2
+-- QuadTree.static.NW = 1
+-- QuadTree.static.NE = 2
+-- QuadTree.static.SW = 3
+-- QuadTree.static.SE = 4
+-- QuadTree.static.PARENT = -1
+--
+-- function QuadTree:initialize(rect, level, maxObjects, maxLevel)
+--     self.rect = rect
+--     self.boundary = nil
+--     self.chidNodes = {}
+--     self.objects = {}
+--     self.level = level
+--     self.maxObjects = maxObjects or QuadTree.DEFAULT_MAX_OBJECTS
+--     self.maxLevel = maxLevel or QuadTree.DEFAULT_MAX_LEVEL
+-- end
+--
+-- function QuadTree:clear()
+--     self.objects = {}
+--     for _, node in ipairs(self.childNodes) do
+--         node:clear()
+--     end
+-- end
+--
+-- function QuadTree:subdivide()
+--     assert(self.level < self.maxLevel, 'subdividing more would exceed max level')
+--
+-- 	local child_w = self.rect.w / QuadTree.CHILD_NODE_SQRT
+-- 	local child_h = self.rect.h / QuadTree.CHILD_NODE_SQRT
+--
+-- 	local x = self.rect.x
+-- 	local y = self.rect.y
+--
+-- 	self.childNodes:insertAt(QuadTree.NW,
+--         QuadTree(Rect(x, y, child_w, child_h), self.level + 1, self.maxObjects, self.maxLevel)
+--     )
+-- 	self.childNodes:insertAt(QuadTree.NE,
+--         QuadTree(Rect(x + child_w, y, child_w, child_h), self.level + 1, self.maxObjects, self.maxLevel)
+--     )
+-- 	self.childNodes:insertAt(QuadTree.SW,
+--         QuadTree(Rect(x, y + child_h, child_w, child_h), self.level + 1, self.maxObjects, self.maxLevel)
+--     )
+-- 	self.childNodes:insertAt(QuadTree.SE,
+--         QuadTree(Rect(x+ child_w, y + child_h, child_w, child_h), self.level + 1, self.maxObjects, self.maxLevel)
+--     )
+-- end
+
+
 -------------------------
 -- Auxiliary functions --
 -------------------------
