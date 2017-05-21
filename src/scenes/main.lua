@@ -17,25 +17,6 @@ return {
                 },
             },
         },
-        {
-            name = 'Camera',
-            components = {
-                {script = 'rope.builtins.camera.camera'},
-                -- constant speed to the right
-                {
-                    script = 'components.movement.motor',
-                    arguments = {axis = 'x', speed = 20}
-                },
-                {
-                    script = 'components.movement.constant_speed_motor_controller',
-                    arguments = {
-                        axis = 'x',
-                        motor_script = 'components.movement.motor',
-                        direction = 1
-                    }
-                },
-            },
-        },
         -- sprites
         {
             name = 'DragonFly',
@@ -99,8 +80,9 @@ return {
                         targetFunction = 'shoot'
                     }
                 },
-                -- link to camera
+                -- camera
                 {script = 'rope.builtins.camera.link'},
+                {script = 'rope.builtins.camera.target'}
             },
             children = {
                 {
@@ -150,5 +132,15 @@ return {
             }},
             prefab = 'prefabs.enemy1'
         }
+    },
+    camera = {
+        name = 'Camera',
+        components = {
+            {script = 'rope.builtins.camera.camera'},
+            {
+                script = 'rope.builtins.camera.scroll',
+                arguments = {axis = 'x', speed = 20}
+            },
+        },
     },
 }

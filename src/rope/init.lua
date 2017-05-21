@@ -254,11 +254,13 @@ local GameObject = GameEntity:subclass('GameObject')
 -- @tparam string name the object's name (empty string if nil given).
 -- @tparam Transform transform the game object's transform.
 -- @tparam GameObject parent an optional parent to the game object.
-function GameObject:initialize(scene, name, transform, parent)
+-- @tparam bool trackObject pass false to *not* add the object to the scene's game objects list
+function GameObject:initialize(scene, name, transform, parent, trackObject)
+    if trackObject ~= false then trackObject = true end
     self.globals = scene.globals
     self.name = name or ''
     GameEntity.initialize(self, transform)
-    scene:addGameObject(self)
+    scene:addGameObject(self, trackObject)
     -- if given, parent must be a game object, else it is the scene
     if parent then
         assert(parent.isInstanceOf and parent:isInstanceOf(GameObject),
@@ -413,10 +415,10 @@ end
 --- builds a game object from its table representation.
 -- @tparam GameScene scene
 -- @tparam table object a game object in its table representation.
-local function buildObject(scene, object)
+local function buildObject(scene, object, trackObject)
     -- create the game object and add it to the scene
     local gameObject = GameObject(
-        scene, object.name, object.transform)
+        scene, object.name, object.transform, nil, trackObject)
     -- get components from prefab if given
     if object.prefab then
         assert(type(object.prefab) == 'string' and object.prefab ~= '',
@@ -513,26 +515,25 @@ function GameScene:load(src)
             buildObject(self, object)
         end
     end
-
-    -- if no camera was given in game objects, build a default camera
-    if not self.camera then
-        buildObject(self, {
-            name = 'Camera',
-            transform = {position = {x = 0, y = 0}},
-            components = {
-                {script = 'rope.builtins.camera.camera'}
-            }
-        })
-    end
+    -- load camera
+    src.camera = src.camera or {
+        name = 'Camera',
+        transform = {position = {x = 0, y = 0}},
+        components = {
+            {script = 'rope.builtins.camera.camera'}
+        }
+    }
+    self.camera = buildObject(self, src.camera, false)
 end
 
 --- adds a game object to the scene. The scene will then be accessible through the game object's `gameScene` attribute.
 -- @tparam GameObject gameObject
-function GameScene:addGameObject(gameObject)
+function GameScene:addGameObject(gameObject, trackObject)
+    if trackObject ~= false then trackObject = true end
     assert(gameObject.isInstanceOf and gameObject:isInstanceOf(GameObject),
     "Can only add GameObject to a GameScene")
     gameObject.gameScene = self
-    table.insert(self.gameObjects, gameObject)
+    if trackObject then table.insert(self.gameObjects, gameObject) end
 end
 
 
@@ -564,7 +565,10 @@ end
 -- @tparam bool firstUpdate true on the first frame update
 function GameScene:update(dt)
     maintainTransform(self)
-    GameEntity.update(self, dt, not self.finishedFirstUpdate)
+    for _, child in ipairs(self.children) do
+        self.camera:apply(child)
+        child:update(dt, not self.finishedFirstUpdate)
+    end
     for _, gameObject in ipairs(self.toDestroy or {}) do
         self:removeGameObject(gameObject)
     end
@@ -577,8 +581,8 @@ end
 --- draws the game scene
 function GameScene:draw()
     self.camera:set()
-    for _, object in ipairs(self.gameObjects) do
-        object:draw(self.settings.debug)
+    for _, gameObject in ipairs(self.gameObjects) do
+        gameObject:draw(self.settings.debug)
     end
     self.camera:unset()
 end
