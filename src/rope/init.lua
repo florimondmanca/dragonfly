@@ -2,11 +2,53 @@ local class = require 'rope.class'
 local geometry = require 'rope.geometry'
 local collections = require 'rope.collections'
 
+-------------------------
+-- Auxiliary functions --
+-------------------------
 
---[[ Component ]]--
+local function assertIn(list, value)
+    local isIn = false
+    for _, v in ipairs(list) do
+        if v == value then isIn = true end
+    end
+    assert(isIn, tostring(value) ..' not found in list')
+end
+
+local function assertType(desiredType, value, name)
+    if type(value) ~= desiredType then
+        error(name .. ' must be a ' .. desiredType .. ', but was ' .. tostring(value) .. '(a ' .. type(value) .. ')')
+    end
+end
+
+--- tests if a value is a strictly positive number.
+-- @param value a value to test.
+-- @tparam string name the name of the value (for error reporting).
+-- @raise error if value is negative or zero.
+local function assertIsPositiveNumber(value, name)
+    if type(value) ~=  'number' or value <= 0 then
+        error(name .. ' must be a positive integer, but was ' .. tostring(value) .. '(' .. type(value) .. ')')
+    end
+end
+
+local function assertTableOfLength(n, table, name)
+    assertType('table', table, name)
+    if type(n) == 'number' then n = {n}
+    else assertType('table', n, 'length') end
+    local pass = false
+    for _, i in ipairs(n) do
+        if #table == i then
+            pass = true
+        end
+    end
+    assert(pass)
+end
+
+
+---------------
+-- Component --
+---------------
 
 local Component = class('Component')
-
 
 function Component:initialize(arguments)
     self.gameObject = nil
@@ -15,12 +57,10 @@ function Component:initialize(arguments)
     end
 end
 
-
 --- callback function, invoked any time a component is attached to a game object.
 function Component:awake()
     -- callback
 end
-
 
 --- use this to make a Component require certain arguments.
 -- Example :
@@ -39,12 +79,10 @@ function Component:require(arguments, ...)
     end
 end
 
-
 --- callback function, called once a frame to update the component.
 -- @param dt delta time as passed to love.update().
 -- @tparam bool firstUpdate true on the very first frame update
 function Component:update() end
-
 
 --- loads a component *class* from a filename.
 -- @param filename the filename to the component class.
@@ -55,7 +93,9 @@ local function loadComponent(filename)
 end
 
 
--- [[ Game Entity ]] --
+-----------------
+-- Game Entity --
+-----------------
 
 --- maintains global position and rotation of a GameEntity.
 --NOTE: only GameEntity:init() and GameEntity:update() should call this function directly.
@@ -90,7 +130,6 @@ local function maintainTransform(self)
 	}):rotate(p.rotation)
 end
 
-
 local GameEntity = class('GameEntity')
 
 --- initializes an entity.
@@ -113,7 +152,6 @@ function GameEntity:initialize(transform, parent)
     maintainTransform(self)
 end
 
-
 --- adds a child to an entity.
 -- @tparam GameEntity child
 -- @tparam bool trackParent if `true` (the default), assigns this entity is assigned to the child.parent field.
@@ -128,7 +166,6 @@ function GameEntity:addChild(child, trackParent)
 
     if trackParent then child.parent = self end
 end
-
 
 --- removes a child from an entity (has no effect is child is not one of the entity's children).
 -- @tparam GameEntity child
@@ -156,7 +193,6 @@ function GameEntity:update(dt, firstUpdate)
         child:update(dt, firstUpdate)
     end
 end
-
 
 --- moves an entity.
 -- @param number dx
@@ -186,8 +222,9 @@ for _, f in ipairs(ENTITIES_CALLBACKS) do
 end
 
 
---[[ GameObject ]]--
-
+----------------
+-- GameObject --
+----------------
 
 --- helper function for getting components of a game object.
 -- @tparam GameObject self
@@ -209,7 +246,6 @@ local function getComponents(self, componentType, num, filter)
     end
     return found
 end
-
 
 local GameObject = GameEntity:subclass('GameObject')
 
@@ -298,13 +334,11 @@ end
 --     end
 -- end
 
-
 --- destroys a game object (it will safely be destroyed at the end of the current frame).
 -- @see GameScene.destroy
 function GameObject:destroy()
     self.gameScene:destroy(self)
 end
-
 
 -- register default callback functions.
 for _, f in ipairs(ENTITIES_CALLBACKS) do
@@ -317,7 +351,9 @@ for _, f in ipairs(ENTITIES_CALLBACKS) do
 end
 
 
--- [[ GameScene ]] --
+---------------
+-- GameScene --
+---------------
 
 --- merges a settings table and the defaults settings table.
 -- @tparam table settings
@@ -404,9 +440,7 @@ local function buildObject(scene, object)
     return gameObject
 end
 
-
 local GameScene = GameEntity:subclass('GameScene')
-
 
 --- initializes a game scene
 -- @tparam string name the scene's name.
@@ -550,10 +584,13 @@ function GameScene:draw()
 end
 
 
-
 return {
     Component = Component,
     GameObject = GameObject,
     GameScene = GameScene,
     loadComponent = loadComponent,
+    assertIn = assertIn,
+    assertType = assertType,
+    assertIsPositiveNumber = assertIsPositiveNumber,
+    assertTableOfLength = assertTableOfLength,
 }
