@@ -2,6 +2,7 @@ local class = require 'rope.class'
 local geometry = require 'rope.geometry'
 local collections = require 'rope.collections'
 
+
 -------------------------
 -- Auxiliary functions --
 -------------------------
