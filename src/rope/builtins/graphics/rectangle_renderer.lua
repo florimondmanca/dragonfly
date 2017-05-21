@@ -3,14 +3,21 @@ local rope = require 'rope'
 local Component = rope.Component:subclass('RectangleRenderer')
 
 function Component:initialize(arguments)
-    self:require(arguments, 'width', 'height')
+    if not arguments.sizeFromImage then
+        self:require(arguments, 'width', 'height')
+    end
     arguments.color = arguments.color or {255, 255, 255}
     arguments.mode = arguments.mode or 'fill'
-    rope.assertIsPositiveNumber(arguments.width, 'width')
-    rope.assertIsPositiveNumber(arguments.height, 'height')
-    rope.assertType('string', arguments.mode, 'mode')
-    rope.assertTableOfLength({3, 4}, arguments.color)
     rope.Component.initialize(self, arguments)
+end
+
+function Component:awake()
+    if self.sizeFromImage then
+        local image = self.gameObject:getComponent(
+            'rope.builtins.graphics.image_renderer').image
+        self.width = image:getWidth()
+        self.height = image:getHeight()
+    end
 end
 
 function Component:draw(debug)

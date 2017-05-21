@@ -416,6 +416,7 @@ local function getPrefabComponents(object)
     end
 
     for _, component in ipairs(components) do
+        component.arguments = component.arguments or {}
         for _, overridden in ipairs(object.prefabComponents) do
             if component.script == overridden.script then
                 for k, v in pairs(overridden.arguments) do
@@ -588,6 +589,7 @@ return {
     Component = Component,
     GameObject = GameObject,
     GameScene = GameScene,
+    buildObject = buildObject,
     loadComponent = loadComponent,
     assertIn = assertIn,
     assertType = assertType,
