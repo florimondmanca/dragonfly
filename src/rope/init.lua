@@ -173,15 +173,18 @@ function GameEntity:removeChild(child)
 	local index = collections.index(self.children, child)
 	if index then
 		table.remove(self.children, index)
+        return true
 	end
+    return false
 end
 
 --- recursively prints a view of the entity's child tree to the console.
 function GameEntity:printChildren(level)
     level = level or 0
+    if level == 0 then print('Children of ' .. self.name .. ':') end
     for _, child in ipairs(self.children) do
-        print('> ' .. string.rep('\t', level), child.name)
-        child:showChildren(level + 1)
+        print(string.rep('\t', level) .. '> ' .. child.name)
+        child:printChildren(level + 1)
     end
 end
 
@@ -189,9 +192,12 @@ end
 -- @param dt delta time as given by love.update().
 -- @tparam bool firstUpdate true on the first frame update
 function GameEntity:update(dt, firstUpdate)
-    for _, child in ipairs(self.children) do
-        child:update(dt, firstUpdate)
-    end
+    local status, err = pcall(function()
+        for _, child in ipairs(self.children) do
+            child:update(dt, firstUpdate)
+        end
+    end)
+    if not status then error(err .. ' (occured in ' .. self.name .. ', ' .. tostring(self) .. ')') end
 end
 
 --- moves an entity.
@@ -346,10 +352,9 @@ end
 --     end
 -- end
 
---- destroys a game object (it will safely be destroyed at the end of the current frame).
--- @see GameScene.destroy
+--- destroys a game object
 function GameObject:destroy()
-    self.gameScene:destroy(self)
+    self.gameScene:removeGameObject(self)
 end
 
 -- register default callback functions.
@@ -543,15 +548,8 @@ function GameScene:addGameObject(gameObject, trackObject)
     if trackObject then table.insert(self.gameObjects, gameObject) end
 end
 
-
---- destroys a game object from the scene (it will be removed from the game objects at the end of the current frame).
--- @tparam gameObject
-function GameScene:destroy(gameObject)
-    self.toDestroy = self.toDestroy or {}
-    table.insert(self.toDestroy, gameObject)
-end
-
---- removes a game object from the scene, as well as all its children (its component will also be removed).
+--- removes a game object from the scene, as well as all its children
+--- (its components will also be removed).
 -- @tparam GameObject gameObject
 function GameScene:removeGameObject(gameObject)
     local index = collections.index(self.gameObjects, gameObject)
@@ -559,15 +557,10 @@ function GameScene:removeGameObject(gameObject)
 		table.remove(self.gameObjects, index)
 	end
     self:removeChild(gameObject)
-
-	for k in pairs(gameObject) do
-		gameObject[k] = nil
-	end
+    -- for k, _ in pairs(gameObject) do gameObject[k] = nil end
 end
 
 --- updates the scene and all its game objects ;
--- objects whose destroy() method has been called in the current frame will
--- be destroyed at the end of this function.
 -- @param dt delta time as given by love.update()
 -- @tparam bool firstUpdate true on the first frame update
 function GameScene:update(dt)
@@ -576,10 +569,6 @@ function GameScene:update(dt)
         self.camera:apply(child)
         child:update(dt, not self.finishedFirstUpdate)
     end
-    for _, gameObject in ipairs(self.toDestroy or {}) do
-        self:removeGameObject(gameObject)
-    end
-    self.toDestroy = {}
     if not self.finishedFirstUpdate then
         self.finishedFirstUpdate = true
     end

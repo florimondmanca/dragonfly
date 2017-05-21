@@ -12,7 +12,7 @@ end
 
 function Component:awake()
     if self.sizeFromImage then
-        local image = self.gameObject.parent:getComponent(
+        local image = self.gameObject:getComponent(
             'rope.builtins.graphics.image_renderer').image
         self.width = image:getWidth()
         self.height = image:getHeight()
@@ -23,7 +23,6 @@ end
 -- callback function: does nothing by default.
 -- @tparam GameObject other
 function Component:resolve()
-    print('resolve!')
     -- callback function
 end
 

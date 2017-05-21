@@ -1,6 +1,4 @@
 local rope = require 'rope'
-local class = require 'rope.class'
-
 
 -- --------------
 -- -- QuadTree --
@@ -79,38 +77,12 @@ end
 local function collideRect(rect1, rect2)
     assertIsRect(rect1)
     assertIsRect(rect2)
-    return (rect2.x - rect1.w < rect1.x and rect1.x < rect2.x + rect2.w)
+    local collided = (rect2.x - rect1.w < rect1.x and rect1.x < rect2.x + rect2.w)
     and (rect2.y - rect1.h < rect1.y and rect1.y < rect2.y + rect2.h)
-end
-
-----------
--- Rect --
-----------
-
-local Rect = class('Rect')
-
---- initializes a rect.
--- @tparam number x
--- @tparam number y
--- @tparam number w rectangle width (must be strictly positive).
--- @tparam number h rectangle height (must be strictly positive).
-function Rect:initialize(x, y, w, h)
-    assertIsRect{x=x, y=y, w=w, h=h}
-    self.x = x
-    self.y = y
-    self.w = w
-    self.h = h
-end
-
---- tests if rect collides with another rect
--- @tparam Rect other another rect
--- @return true if rect and other collide, false otherwise.
-function Rect:collide(other)
-    return collideRect(self, other)
+    return collided
 end
 
 
 return {
-    Rect = Rect,
     collideRect = collideRect,
 }
