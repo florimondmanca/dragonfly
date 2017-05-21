@@ -25,7 +25,18 @@ function Component:shoot()
         {filename=self.filename}
     )
     bulletObject:addComponent(
-        rope.loadComponent('components.die_out_of_screen')())
+        rope.loadComponent('components.die_out_of_screen')()
+    )
+    -- add a rectangle to bullet for collision detection
+    local rectangle = rope.GameObject(
+        self.gameScene, 'Bullet rectangle', {position = {
+            x = 0, y = 0}
+        }, bulletObject
+    )
+    bulletObject:addChild(rectangle)
+    rectangle:addComponent(
+        rope.loadComponent('rope.builtins.collision.rectangle'){sizeFromImage = true}
+    )
 end
 
 return Component
