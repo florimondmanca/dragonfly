@@ -15,7 +15,7 @@ return {
                     script = 'rope.builtins.event.event_manager',
                     arguments = {events = {'shoot'}}
                 },
-            }
+            },
         },
         {
             name = 'Camera',
@@ -100,9 +100,7 @@ return {
                     }
                 },
                 -- link to camera
-                {
-                    script = 'rope.builtins.camera.link'
-                },
+                {script = 'rope.builtins.camera.link'},
             },
             children = {
                 {
