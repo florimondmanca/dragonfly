@@ -620,7 +620,6 @@ function GameScene:update(dt)
     if not self.finishedFirstUpdate then
         self.finishedFirstUpdate = true
     end
-    print(collectgarbage('count')*1024)
 end
 
 --- draws the game scene

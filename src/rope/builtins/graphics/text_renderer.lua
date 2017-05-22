@@ -2,6 +2,9 @@ local rope = require 'rope'
 
 local Component = rope.Component:subclass('TextRenderer')
 
+----- initializes a text renderer
+-- @tparam string text an initial text to render (default is empty string)
+-- @tparam table color the color of the text (default is white)
 function Component:initialize(arguments)
     arguments.color = arguments.color or {255, 255, 255, 255}
     arguments.text = arguments.text or ''

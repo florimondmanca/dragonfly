@@ -2,8 +2,12 @@ local rope = require 'rope'
 
 local KeyTrigger = rope.Component:subclass('KeyTrigger')
 
+----- initializes a key trigger
+-- key triggers trigger events when a specific key is pressed
+-- @tparam string key (required)
+-- @tparam string event the event to trigger on key pressed
 function KeyTrigger:initialize(arguments)
-    self.key = arguments.key or 'space'
+    self:require(arguments, 'key')
     self.event = arguments.event or ''
     rope.Component.initialize(self)
 end

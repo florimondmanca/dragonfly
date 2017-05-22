@@ -2,10 +2,17 @@ local rope = require 'rope'
 
 local EventListener = rope.Component:subclass('EventListener')
 
+----- initializes an event listener
+-- event listeners manage the dispatch of events from triggers to event
+-- managers.
+-- @tparam string event the name of the event to listen to.
+-- @tparam string targetComponent the script of the component that should
+-- react to the event.
+-- @tparam string targetFunction the name of the target component's function
+-- to call on reaction to the event.
 function EventListener:initialize(arguments)
+    self:require(arguments, 'targetComponent', 'targetFunction')
     self.event = arguments.event or ''
-    self.targetComponent = arguments.targetComponent or error('targetComponent must be declared')
-    self.targetFunction = arguments.targetFunction or error('targetFunction must be declared')
     rope.Component.initialize(self)
 end
 

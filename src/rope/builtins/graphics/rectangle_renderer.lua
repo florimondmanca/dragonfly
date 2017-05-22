@@ -2,6 +2,14 @@ local rope = require 'rope'
 
 local Component = rope.Component:subclass('RectangleRenderer')
 
+----- initializes a rectangle renderer.
+-- @tparam number width (required if sizeFromImage is false or nil)
+-- @tparam number height (required if sizeFromImage is false or nil)
+-- @tparam table color the color of the rectangle (default is white).
+-- @tparam string mode 'fill' or 'line'.
+-- @tparam bool sizeFromImage pass true to infer width and height from
+-- owner's image (requires the owner to have a
+-- rope.builtins.graphics.image_renderer component).
 function Component:initialize(arguments)
     if not arguments.sizeFromImage then
         self:require(arguments, 'width', 'height')

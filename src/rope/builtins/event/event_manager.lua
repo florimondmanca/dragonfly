@@ -2,6 +2,11 @@ local rope = require 'rope'
 
 local EventManager = rope.Component:subclass('EventManager')
 
+----- initializes an event manager
+-- event managers group listeners and triggers together.
+-- all possible events must be declared on creation, so that the
+-- manager can populate the globals.events table accordingly.
+-- @tparam table events the list of possible events (default is empty table)
 function EventManager:initialize(arguments)
     self.events = arguments.events or {}
     rope.Component.initialize(self)

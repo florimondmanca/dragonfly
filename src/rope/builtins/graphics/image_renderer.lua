@@ -2,6 +2,8 @@ local rope = require 'rope'
 
 local Component = rope.Component:subclass('ImageRenderer')
 
+----- initializes an image renderer
+-- @tparam string filename path to the image file (required)
 function Component:initialize(arguments)
     self:require(arguments, 'filename')
     arguments = {image = love.graphics.newImage(arguments.filename)}

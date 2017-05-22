@@ -3,8 +3,10 @@ local collision = require 'rope.collision'
 
 local AABB_SCRIPT = 'rope.builtins.collision.aabb'
 
--- Checks collision between the owner game object's AABB and
--- all other game objects that have an AABB
+----- initializes a collision trigger
+-- collision triggers trigger an event when the owner's AABB and another
+-- game object's AABB collide.
+-- @tparam string event the name of the event to trigger on collision
 local Trigger = rope.Component:subclass('CollisionTrigger')
 
 function Trigger:initialize(arguments)
