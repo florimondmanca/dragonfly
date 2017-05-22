@@ -80,6 +80,37 @@ function Component:require(arguments, ...)
     end
 end
 
+
+--- callback function. use to declare what components this component needs to work correctly.
+function Component:worksWith()
+    -- callback function
+    return {}
+end
+
+
+--- use this to make a Component require the owner to have other specified components
+-- Example :
+--     ```self:requireComponents('rope.builtins.graphics.image_renderer')
+-- @tparam varargs components a varargs of component scripts of classes
+-- @raise error if any of the required components is missing (with a list of all missing components)
+function Component:requireComponents()
+    local worksWith = self:worksWith()
+    assertType('table', worksWith, 'worksWith')
+    local missing = {}
+    for _, componentScript in ipairs(self:worksWith()) do
+        if not pcall(function()
+            self.gameObject:getComponent(componentScript)
+        end) then
+            table.insert(missing, componentScript)
+        end
+    end
+    if #missing > 0 then
+        error('Component ' .. self.class.name ..
+        ' required the following missing components to work with: '
+        .. table.concat(missing, ', '))
+    end
+end
+
 --- callback function, called once a frame to update the component.
 -- @param dt delta time as passed to love.update().
 -- @tparam bool firstUpdate true on the very first frame update
@@ -279,6 +310,7 @@ function GameObject:initialize(scene, name, transform, parent, trackObject)
     self.components = {}
 end
 
+
 --- updates the game object, all its components and all its children.
 -- @param dt delta time as given by love.update().
 -- @tparam bool firstUpdate true on the first frame update
@@ -316,6 +348,7 @@ function GameObject:addComponent(component)
     component.gameObject = self
     component.gameScene = self.gameScene
     component.globals = self.gameScene.globals
+    component:requireComponents()
     component:awake()
     return component
 end

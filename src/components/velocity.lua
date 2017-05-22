@@ -14,6 +14,11 @@ function Component:applyForce(fx, fy)
     self.fy = self.fy + fy or 0
 end
 
+function Component:set(vx, vy)
+    self.vx = vx
+    self.vy = vy
+end
+
 function Component:update(dt)
     self.vx = self.vx + self.fx * dt
     self.vy = self.vy + self.fy * dt

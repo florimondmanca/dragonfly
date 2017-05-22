@@ -10,6 +10,7 @@ function Component:initialize(arguments)
 end
 
 function Component:awake()
+    self:requireComponents('components.shooter')
     self.shooter = self.gameObject:getComponent('components.shooter')
     self:resetTimer()
 end
