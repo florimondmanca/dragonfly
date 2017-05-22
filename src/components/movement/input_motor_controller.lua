@@ -1,10 +1,18 @@
-local MotorController = require('components.base').MotorController
+local rope = require 'rope'
 
-local Component = MotorController:subclass('InputMotorController')
+local Component = rope.Component:subclass('InputMotorController')
 
 function Component:initialize(arguments)
     self:require(arguments, 'keyPlus', 'keyMinus')
-    MotorController.initialize(self, arguments)
+    rope.Component.initialize(self, arguments)
+end
+
+function Component:worksWith()
+    return {'components.movement.motor'}
+end
+
+function Component:awake()
+    self.motor = self.gameObject:getComponent('components.movement.motor')
 end
 
 function Component:update(dt)

@@ -7,6 +7,9 @@ return {
         },
         -- motion control
         {
+            script = 'components.velocity'
+        },
+        {
             script = 'components.movement.physics_motor',
             arguments = {axis = 'y', speed = 150, drag = 5}
         },

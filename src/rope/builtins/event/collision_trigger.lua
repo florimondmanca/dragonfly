@@ -15,9 +15,8 @@ end
 function Trigger:update()
     local rect = self.gameObject:getComponent(RECT_SCRIPT)
     for _, gameObject in ipairs(self.gameScene.gameObjects) do
-        local other
-        if pcall(function() other = gameObject:getComponent(RECT_SCRIPT) end)
-        and other ~= rect then
+        local other = gameObject:getComponent(RECT_SCRIPT)
+        if other and other ~= rect then
             if collision.collideRect(rect:getAABB(), other:getAABB()) then
                 local e = self.globals.events[self.event]
                 assert(e, 'Trigger could not find event ' .. self.event ..

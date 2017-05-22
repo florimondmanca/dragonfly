@@ -1,19 +1,14 @@
-local rope = require 'rope'
+local Motor = require 'components.movement.motor'
 
-local Component = rope.Component:subclass('PhysicsMotor')
+local Component = Motor:subclass('PhysicsMotor')
 
 function Component:initialize(arguments)
-    self:require('axis', 'speed')
     arguments.drag = arguments.drag or 1
-    rope.Component.initialize(self, arguments)
+    Motor.initialize(self, arguments)
 end
 
-function Component:worksWith()
-    return {'components.velocity'}
-end
-
-function Component:awake()
-    self.velocity = self.gameObject:getComponent('components.velocity')
+function Component:update()
+    self.velocity:applyForce(-self.drag * self.velocity.vx, -self.drag * self.velocity.vy)
 end
 
 function Component:move(direction)

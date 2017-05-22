@@ -88,7 +88,7 @@ function Component:worksWith()
 end
 
 
---- use this to make a Component require the owner to have other specified components
+--- use this to make a Component require the owner to have other specified components.
 -- Example :
 --     ```self:requireComponents('rope.builtins.graphics.image_renderer')
 -- @tparam varargs components a varargs of component scripts of classes
@@ -96,16 +96,34 @@ end
 function Component:requireComponents()
     local worksWith = self:worksWith()
     assertType('table', worksWith, 'worksWith')
+
     local missing = {}
-    for _, componentScript in ipairs(self:worksWith()) do
-        if not pcall(function()
-            self.gameObject:getComponent(componentScript)
-        end) then
-            table.insert(missing, componentScript)
+
+    for _, componentScripts in ipairs(self:worksWith()) do
+        -- if single, adapt to a table
+        if type(componentScripts) ~= 'table' then
+            componentScripts = {componentScripts}
+        end
+
+        -- look for one of the component scripts
+        local found = false
+        for _, script in ipairs(componentScripts) do
+            if self.gameObject:getComponent(script) then
+                found = true
+            end
+        end
+        -- if no matching component script was found, at to
+        if not found then
+            if #componentScripts == 1 then
+                table.insert(missing, componentScripts[1])
+            else
+                table.insert(missing,
+                    'one of {' .. table.concat(componentScripts, ', ') .. '}')
+            end
         end
     end
     if #missing > 0 then
-        error('Component ' .. self.class.name ..
+        error('Component ' .. self.class.name .. ' from ' .. self.gameObject.name ..
         ' required the following missing components to work with: '
         .. table.concat(missing, ', '))
     end
@@ -366,9 +384,7 @@ end
 -- @tparam Component componentType the component's class or a string refering to the component's module filename.
 -- @tparam func filter optional filter function: f(component) -> true or false.
 function GameObject:getComponent(componentType, filter)
-    return getComponents(self, componentType, 1, filter)[1] or
-        error('No component ' .. tostring(componentType) .. ' found' ..
-        (filter and ' with conditions ' .. tostring(filter) or ''))
+    return getComponents(self, componentType, 1, filter)[1]
 end
 
 --- gets all components of a game object of a given type.

@@ -48,18 +48,6 @@ return {
                         motor_script = 'components.movement.physics_motor'
                     }
                 },
-                {
-                    script = 'components.movement.physics_motor',
-                    arguments = {axis='x', speed=50, drag=10},
-                },
-                {
-                    script = 'components.movement.input_motor_controller',
-                    arguments = {
-                        axis='x',
-                        keyPlus='right', keyMinus='left',
-                        motor_script = 'components.movement.physics_motor'
-                    }
-                },
                 -- shooting
                 {
                     script = 'components.shooter',
