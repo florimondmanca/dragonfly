@@ -8,11 +8,7 @@ function Component:initialize(arguments)
 end
 
 function Component:worksWith()
-    return {'components.velocity'}
-end
-
-function Component:awake()
-    self.velocity = self.gameObject:getComponent('components.velocity')
+    return {velocity = {script = 'components.velocity'}}
 end
 
 function Component:move(direction)

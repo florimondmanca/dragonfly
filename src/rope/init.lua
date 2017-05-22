@@ -82,6 +82,8 @@ end
 
 
 --- callback function. use to declare what components this component needs to work correctly.
+-- example :
+-- return {velocity = {script = 'components.velocity'}}
 function Component:worksWith()
     -- callback function
     return {}
@@ -89,8 +91,6 @@ end
 
 
 --- use this to make a Component require the owner to have other specified components.
--- Example :
---     ```self:requireComponents('rope.builtins.graphics.image_renderer')
 -- @tparam varargs components a varargs of component scripts of classes
 -- @raise error if any of the required components is missing (with a list of all missing components)
 function Component:requireComponents()
@@ -99,27 +99,15 @@ function Component:requireComponents()
 
     local missing = {}
 
-    for _, componentScripts in ipairs(self:worksWith()) do
-        -- if single, adapt to a table
-        if type(componentScripts) ~= 'table' then
-            componentScripts = {componentScripts}
-        end
-
-        -- look for one of the component scripts
-        local found = false
-        for _, script in ipairs(componentScripts) do
-            if self.gameObject:getComponent(script) then
-                found = true
-            end
-        end
+    for name, entry in pairs(self:worksWith()) do
+        local script, filter = entry.script, entry.filter
+        assert(script, 'missing script in worksWith declaration of ' .. self.class.name)
+        local component = self.gameObject:getComponent(script, filter)
         -- if no matching component script was found, at to
-        if not found then
-            if #componentScripts == 1 then
-                table.insert(missing, componentScripts[1])
-            else
-                table.insert(missing,
-                    'one of {' .. table.concat(componentScripts, ', ') .. '}')
-            end
+        if not component then
+            table.insert(missing, script)
+        else
+            self[name] = component
         end
     end
     if #missing > 0 then

@@ -3,16 +3,17 @@ local rope = require 'rope'
 local Component = rope.Component:subclass('InputMotorController')
 
 function Component:initialize(arguments)
-    self:require(arguments, 'keyPlus', 'keyMinus')
+    self:require(arguments, 'axis', 'keyPlus', 'keyMinus', 'motor_script')
     rope.Component.initialize(self, arguments)
 end
 
 function Component:worksWith()
-    return {'components.movement.motor'}
-end
-
-function Component:awake()
-    self.motor = self.gameObject:getComponent('components.movement.motor')
+    return {
+        motor = {
+            script = self.motor_script,
+            filter = function(c) return c.axis == self.axis end
+        }
+    }
 end
 
 function Component:update(dt)
