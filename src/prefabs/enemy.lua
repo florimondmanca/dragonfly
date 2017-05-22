@@ -7,7 +7,7 @@ return {
         },
         -- motion control
         {
-            script = 'components.velocity'
+            script = 'components.movement.velocity'
         },
         {
             script = 'components.movement.physics_motor',

@@ -12,13 +12,13 @@ function Component:initialize(arguments)
     rope.Component.initialize(self, arguments)
 end
 
+function Component:worksWith()
+    return {text = {script = 'rope.builtins.graphics.text_renderer'}}
+end
+
 function Component:update(dt)
     self.time = self.time + dt
     if self.time > self.period then
-        if not self.text then
-            self.text = self.gameObject:getComponent(
-                'rope.builtins.graphics.text_renderer')
-        end
         self.text:setText('FPS: ' .. format(1/dt))
         self.time = 0
     end

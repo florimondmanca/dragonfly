@@ -8,7 +8,7 @@ function Component:initialize(arguments)
 end
 
 function Component:worksWith()
-    return {velocity = {script = 'components.velocity'}}
+    return {velocity = {script = 'components.movement.velocity'}}
 end
 
 function Component:move(direction)

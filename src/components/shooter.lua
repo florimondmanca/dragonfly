@@ -27,7 +27,7 @@ function Component:shoot()
         prefab = 'prefabs.bullet',
         prefabComponents = {
             {
-                script = 'components.velocity',
+                script = 'components.movement.velocity',
                 arguments = {vx = self.bulletSpeed},
             },
             {

@@ -1,7 +1,7 @@
 return {
     components = {
         {
-            script = 'components.velocity',
+            script = 'components.movement.velocity',
             -- give vx
         },
         {

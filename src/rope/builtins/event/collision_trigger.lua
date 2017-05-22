@@ -1,7 +1,7 @@
 local rope = require 'rope'
 local collision = require 'rope.collision'
 
-local RECT_SCRIPT = 'rope.builtins.collision.aabb'
+local AABB_SCRIPT = 'rope.builtins.collision.aabb'
 
 -- Checks collision between the owner game object's AABB and
 -- all other game objects that have an AABB
@@ -13,11 +13,15 @@ function Trigger:initialize(arguments)
 end
 
 function Trigger:update()
-    local rect = self.gameObject:getComponent(RECT_SCRIPT)
+    local aabb = self.gameObject:getComponent(AABB_SCRIPT)
+
+    -- look for other AABB's that collide with this one
     for _, gameObject in ipairs(self.gameScene.gameObjects) do
-        local other = gameObject:getComponent(RECT_SCRIPT)
-        if other and other ~= rect then
-            if collision.collideRect(rect:getAABB(), other:getAABB()) then
+        local other = gameObject:getComponent(AABB_SCRIPT)
+        -- aabb's of a same game object won't collide
+        if other and gameObject ~= self.gameObject then
+            if collision.collideRect(aabb:getAABB(), other:getAABB()) then
+                -- trigger an event on collision
                 local e = self.globals.events[self.event]
                 assert(e, 'Trigger could not find event ' .. self.event ..
                 '. Was it declared in an EventManager game object?')

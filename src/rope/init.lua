@@ -73,7 +73,7 @@ end
 
 --- callback function. use to declare what components this component needs to work correctly.
 -- example :
--- return {velocity = {script = 'components.velocity'}}
+-- return {velocity = {script = 'components.movement.velocity'}}
 function Component:worksWith()
     -- callback function
     return {}
