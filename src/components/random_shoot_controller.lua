@@ -9,9 +9,13 @@ function Component:initialize(arguments)
     rope.Component.initialize(self, arguments)
 end
 
+function Component:worksWith()
+    return {
+        shooter = {script = 'components.shooter'}
+    }
+end
+
 function Component:awake()
-    self:requireComponents('components.shooter')
-    self.shooter = self.gameObject:getComponent('components.shooter')
     self:resetTimer()
 end
 

@@ -1,8 +1,12 @@
 local rope = require 'rope'
 
 local Component = rope.Component:subclass('Shooter')
-Component.static.k = 0
 
+--- initializes a shooter
+-- @tparam number bulletSpeed the speed of the bullet (required)
+-- @tparam string filename the path to the bullet's image (required)
+-- @tparam number shiftX generated bullets will be shifted on x by this amount
+-- @tparam number shiftY generated bullets will be shifted on y by this amount
 function Component:initialize(arguments)
     self:require(arguments, 'bulletSpeed', 'filename')
     arguments.shiftX = arguments.shiftX or 0
@@ -13,7 +17,7 @@ end
 function Component:shoot()
     -- create a separated, independant bullet object in the scene
     local bullet = {
-        name = 'Bullet ' .. Component.k,
+        name = 'Bullet',
         transform = {
             position = {
                 x = self.gameObject.globalTransform.position.x + self.shiftX,
@@ -34,7 +38,6 @@ function Component:shoot()
     }
     local object = rope.buildObject(self.gameScene, bullet)
     object.source = self.gameObject
-    Component.static.k = Component.k + 1
 end
 
 return Component

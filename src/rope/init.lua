@@ -7,15 +7,17 @@ local collections = require 'rope.collections'
 -- Auxiliary functions --
 -------------------------
 
-local function assertIn(list, value)
+local function assertIn(list, value, name)
+    name = name or 'value'
     local isIn = false
     for _, v in ipairs(list) do
         if v == value then isIn = true end
     end
-    assert(isIn, tostring(value) ..' not found in list')
+    assert(isIn, name .. ' must be one of ' .. table.concat(list, ', ') .. ', but was ' .. tostring(value))
 end
 
 local function assertType(desiredType, value, name)
+    name = name or 'value'
     if type(value) ~= desiredType then
         error(name .. ' must be a ' .. desiredType .. ', but was ' .. tostring(value) .. '(a ' .. type(value) .. ')')
     end
@@ -26,22 +28,10 @@ end
 -- @tparam string name the name of the value (for error reporting).
 -- @raise error if value is negative or zero.
 local function assertIsPositiveNumber(value, name)
+    name = name or 'value'
     if type(value) ~=  'number' or value <= 0 then
         error(name .. ' must be a positive integer, but was ' .. tostring(value) .. '(' .. type(value) .. ')')
     end
-end
-
-local function assertTableOfLength(n, table, name)
-    assertType('table', table, name)
-    if type(n) == 'number' then n = {n}
-    else assertType('table', n, 'length') end
-    local pass = false
-    for _, i in ipairs(n) do
-        if #table == i then
-            pass = true
-        end
-    end
-    assert(pass)
 end
 
 
@@ -632,5 +622,4 @@ return {
     assertIn = assertIn,
     assertType = assertType,
     assertIsPositiveNumber = assertIsPositiveNumber,
-    assertTableOfLength = assertTableOfLength,
 }

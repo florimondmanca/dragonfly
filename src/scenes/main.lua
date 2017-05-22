@@ -93,7 +93,7 @@ return {
                 x = 600,
                 y = love.graphics.getHeight()/2
             }},
-            prefab = 'prefabs.enemy1',
+            prefab = 'prefabs.enemy',
         },
         {
             name = 'Enemy',
@@ -101,7 +101,7 @@ return {
                 x = 675,
                 y = love.graphics.getHeight()/2
             }},
-            prefab = 'prefabs.enemy1',
+            prefab = 'prefabs.enemy',
         },
         {
             name = 'Enemy',
@@ -109,7 +109,7 @@ return {
                 x = 750,
                 y = love.graphics.getHeight()/2
             }},
-            prefab = 'prefabs.enemy1'
+            prefab = 'prefabs.enemy'
         }
     },
     camera = {

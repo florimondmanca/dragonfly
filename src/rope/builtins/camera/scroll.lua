@@ -5,7 +5,7 @@ local Component = rope.Component:subclass('ScrollCamera')
 
 function Component:initialize(arguments)
     self:require(arguments, 'axis', 'speed')
-    rope.assertIn({'x', 'y'}, arguments.axis)
+    rope.assertIn({'x', 'y'}, arguments.axis, 'axis')
     rope.Component.initialize(self, arguments)
 end
 
