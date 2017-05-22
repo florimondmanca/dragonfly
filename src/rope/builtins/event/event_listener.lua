@@ -18,9 +18,11 @@ end
 function EventListener:eventStart(source)
     if self.targetComponent and self.targetFunction then
         local component = self.gameObject:getComponent(self.targetComponent)
-        local action = component[self.targetFunction]
-        assert(action, component.class.name .. ' has no action ' .. self.targetFunction)
-        action(component, source)
+        if component then
+            local action = component[self.targetFunction]
+            assert(action, component.class.name .. ' has no action ' .. self.targetFunction)
+            action(component, source)
+        end
     end
 end
 

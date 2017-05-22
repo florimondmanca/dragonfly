@@ -206,6 +206,13 @@ function GameEntity:removeChild(child)
     return false
 end
 
+function GameEntity:removeAllChildren()
+    for k, child in pairs(self.children) do
+        child:removeAllChildren()
+        self.children[k] = nil
+    end
+end
+
 --- recursively prints a view of the entity's child tree to the console.
 function GameEntity:printChildren(level)
     level = level or 0
@@ -337,6 +344,11 @@ function GameObject:addChild(child)
 	GameEntity.addChild(self, child)
 end
 
+function GameObject:removeAllChildren()
+    self:removeAllComponents()
+    GameEntity.removeAllChildren(self)
+end
+
 --- adds a component to a game object.
 -- @tparam Component component
 function GameObject:addComponent(component)
@@ -379,6 +391,12 @@ end
 --         end
 --     end
 -- end
+
+function GameObject:removeAllComponents()
+    for k, _ in pairs(self.components) do
+        self.components[k] = nil
+    end
+end
 
 --- destroys a game object
 function GameObject:destroy()
@@ -585,8 +603,8 @@ function GameScene:removeGameObject(gameObject)
 	if index then
 		table.remove(self.gameObjects, index)
 	end
+    gameObject:removeAllChildren()
     self:removeChild(gameObject)
-    -- for k, _ in pairs(gameObject) do gameObject[k] = nil end
 end
 
 --- updates the scene and all its game objects ;

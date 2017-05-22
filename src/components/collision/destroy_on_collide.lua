@@ -23,9 +23,9 @@ function Component:awake()
         if them.source then
             if them.source == me then return end
         end
-
-        local onCollide = onCollideWithGroup
-            [them:getComponent(AABB_SCRIPT).collideGroup]
+        local themAABB = them:getComponent(AABB_SCRIPT)
+        if not themAABB then return end
+        local onCollide = onCollideWithGroup[themAABB.collideGroup]
         if onCollide then
             if onCollide.destroySelf then me:destroy() end
             if onCollide.destroyOther then them:destroy() end

@@ -58,6 +58,33 @@ return {
                         filename = 'static/img/bullet-right.png',
                     }
                 },
+                -- collision
+                -- create an AABB
+                {
+                    script = 'rope.builtins.collision.aabb',
+                    arguments = {
+                        collideGroup = 'player',
+                        sizeFromImage = true
+                    }
+                },
+                -- define on collide behavior
+                {
+                    script = 'components.collision.destroy_on_collide',
+                    arguments = {
+                        onCollideWithGroup = {
+                            bullet = {destroySelf = true, destroyOther = true}
+                        }
+                    }
+                },
+                -- add AABB debug rectangle
+                {
+                    script = 'rope.builtins.graphics.rectangle_renderer',
+                    arguments = {
+                        sizeFromImage = true,
+                        mode = 'line',
+                        isDebug = true
+                    }
+                },
                 -- events
                 {
                     script = 'rope.builtins.event.key_trigger',
@@ -71,9 +98,22 @@ return {
                         targetFunction = 'shoot'
                     }
                 },
+                -- listen to collision events
+                {
+                    script = 'rope.builtins.event.collision_trigger',
+                    arguments = {event = 'collision'}
+                },
+                {
+                    script = 'rope.builtins.event.event_listener',
+                    arguments = {
+                        event = 'collision',
+                        targetComponent = 'rope.builtins.collision.aabb',
+                        targetFunction = 'resolve'
+                    }
+                },
                 -- camera
                 {script = 'rope.builtins.camera.link'},
-                {script = 'rope.builtins.camera.target'}
+                -- {script = 'rope.builtins.camera.target'}
             },
             children = {
                 {
