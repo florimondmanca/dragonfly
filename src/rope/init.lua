@@ -95,7 +95,7 @@ function Component:requireComponents()
         local component = self.gameObject:getComponent(script, filter)
         -- if no matching component script was found, at to
         if not component then
-            table.insert(missing, script)
+            missing[#missing + 1] = script
         else
             self[name] = component
         end
@@ -189,8 +189,7 @@ function GameEntity:addChild(child, trackParent)
     assert(child ~= self, 'circular reference: cannot add self as child')
 
     if trackParent == nil then trackParent = true end
-
-    table.insert(self.children, child)
+    self.children[#self.children + 1] = child
 
     if trackParent then child.parent = self end
 end
@@ -209,7 +208,7 @@ end
 function GameEntity:removeAllChildren()
     for k, child in pairs(self.children) do
         child:removeAllChildren()
-        self.children[k] = nil
+        child[k] = nil
     end
 end
 
@@ -281,7 +280,7 @@ local function getComponents(self, componentType, num, filter)
     local found = {}
     for _, component in ipairs(self.components) do
         if component:isInstanceOf(componentType) and filter(component) then
-            table.insert(found, component)
+            found[#found + 1] = component
         end
         if #found >= num then return found end
     end
@@ -352,7 +351,7 @@ end
 --- adds a component to a game object.
 -- @tparam Component component
 function GameObject:addComponent(component)
-    table.insert(self.components, component)
+    self.components[#self.components + 1] = component
     component.gameObject = self
     component.gameScene = self.gameScene
     component.globals = self.gameScene.globals
@@ -454,7 +453,7 @@ local function getPrefabComponents(object)
     local prefabTable = require(object.prefab)
     local components = {}
     for _, component in ipairs(prefabTable.components) do
-        table.insert(components, component)
+        components[#components + 1] = component
     end
 
     if not object.prefabComponents then
@@ -487,7 +486,7 @@ local function buildObject(scene, object, trackObject)
             'Prefab must be non-empty string')
         object.components = object.components or {}
         for _, component in ipairs(getPrefabComponents(object)) do
-            table.insert(object.components, component)
+            object.components[#object.components + 1] = component
         end
     end
     -- add components
@@ -592,7 +591,9 @@ function GameScene:addGameObject(gameObject, trackObject)
     assert(gameObject.isInstanceOf and gameObject:isInstanceOf(GameObject),
     "Can only add GameObject to a GameScene")
     gameObject.gameScene = self
-    if trackObject then table.insert(self.gameObjects, gameObject) end
+    if trackObject then
+        self.gameObjects[#self.gameObjects + 1] = gameObject
+    end
 end
 
 --- removes a game object from the scene, as well as all its children
@@ -619,6 +620,7 @@ function GameScene:update(dt)
     if not self.finishedFirstUpdate then
         self.finishedFirstUpdate = true
     end
+    print(collectgarbage('count')*1024)
 end
 
 --- draws the game scene

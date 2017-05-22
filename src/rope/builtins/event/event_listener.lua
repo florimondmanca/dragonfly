@@ -12,7 +12,7 @@ end
 function EventListener:awake()
     local e = self.globals.events[self.event]
     assert(e, 'EventListener could not find event ' .. self.event)
-    table.insert(e.listeners, self)
+    e.listeners[#e.listeners + 1] = self
 end
 
 function EventListener:eventStart(source)
