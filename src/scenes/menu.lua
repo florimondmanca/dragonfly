@@ -47,7 +47,8 @@ return {
                 {
                     script = 'rope.builtins.event.on_click',
                     arguments = {onClick = function (self)
-                        print('Clicked play!')
+                        print('Clicked play')
+                        self.gameScene:load('scenes/main.lua')
                     end}
                 },
             }

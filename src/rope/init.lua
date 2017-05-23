@@ -632,6 +632,13 @@ function GameScene:draw()
 end
 
 
+local sizeFromDefaults = {
+    image = 'rope.builtins.graphics.image_renderer',
+    text = 'rope.builtins.graphics.text_renderer',
+    rectangle = 'rope.builtins.graphics.rectangle_renderer',
+}
+
+
 return {
     Component = Component,
     GameObject = GameObject,
@@ -641,4 +648,5 @@ return {
     assertIn = assertIn,
     assertType = assertType,
     assertIsPositiveNumber = assertIsPositiveNumber,
+    sizeFromDefaults = sizeFromDefaults,
 }

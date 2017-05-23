@@ -7,13 +7,14 @@ function Component:initialize(arguments)
     if not arguments.sizeFrom then
         self:require(arguments, 'width', 'height')
     end
-    self:require(arguments, 'collideGroup')
+    arguments.collideGroup = arguments.collideGroup or ''
     rope.Component.initialize(self, arguments)
 end
 
 function Component:awake()
-    if self.sizeFrom then
-        local component = self.gameObject:getComponent(self.sizeFrom)
+    local sizeFrom = rope.sizeFromDefaults[self.sizeFrom] or self.sizeFrom
+    if sizeFrom then
+        local component = self.gameObject:getComponent(sizeFrom)
         self.width, self.height = component:getDimensions()
     end
 end
@@ -30,10 +31,10 @@ end
 -- @tparam number y
 -- @return true if (x, y) is inside the AABB, false otherwise
 function Component:contains(x, y)
-    return collision.containsPoint(self:getAABB(), x, y)
+    return collision.containsPoint(self:get(), x, y)
 end
 
-function Component:getAABB()
+function Component:get()
     local pos = self.gameObject.globalTransform.position
     return {x = pos.x, y = pos.y, w = self.width, h = self.height}
 end

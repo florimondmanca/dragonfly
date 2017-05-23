@@ -20,9 +20,8 @@ function Component:awake()
         local me, them = objects.me, objects.them
         -- if the other object was created by myself (e.g. a bullet)
         -- then don't destroy anyone!
-        if them.source then
-            if them.source == me then return end
-        end
+        if them.source == me then return end
+
         local themAABB = them:getComponent(AABB_SCRIPT)
         if not themAABB then return end
         local onCollide = onCollideWithGroup[themAABB.collideGroup]

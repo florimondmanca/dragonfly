@@ -10,25 +10,26 @@ local AABB_SCRIPT = 'rope.builtins.collision.aabb'
 local Trigger = rope.Component:subclass('CollisionTrigger')
 
 function Trigger:initialize(arguments)
-    self.event = arguments.event or ''
-    rope.Component.initialize(self)
+    self:require(arguments, 'event')
+    rope.Component.initialize(self, arguments)
 end
 
 function Trigger:update()
-    local aabb = self.gameObject:getComponent(AABB_SCRIPT)
-
-    -- look for other AABB's that collide with this one
-    for _, gameObject in ipairs(self.gameScene.gameObjects) do
-        local other = gameObject:getComponent(AABB_SCRIPT)
-        -- aabb's of a same game object won't collide
-        if other and gameObject ~= self.gameObject then
-            if collision.collideRect(aabb:getAABB(), other:getAABB()) then
-                -- trigger an event on collision
-                local e = self.globals.events[self.event]
-                assert(e, 'Trigger could not find event ' .. self.event ..
-                '. Was it declared in an EventManager game object?')
-                -- send gameObject as the one that caused the collision
-                e:trigger({gameObject={me=self.gameObject, them=gameObject}})
+    for _, o1 in ipairs(self.gameScene.gameObjects) do
+        local aabb1 = o1:getComponent(AABB_SCRIPT)
+        if aabb1 then
+            for _, o2 in ipairs(self.gameScene.gameObjects) do
+                local aabb2 = o2:getComponent(AABB_SCRIPT)
+                if aabb2 and o1 ~= o2 then
+                    if collision.collideRect(aabb1:get(), aabb2:get()) then
+                        -- trigger an event on collision
+                        local e = self.globals.events[self.event]
+                        assert(e, 'Trigger could not find event ' .. self.event ..
+                        '. Was it declared in an EventManager game object?')
+                        -- send gameObject as the one that caused the collision
+                        e:trigger({gameObject={me=o1, them=o2}})
+                    end
+                end
             end
         end
     end

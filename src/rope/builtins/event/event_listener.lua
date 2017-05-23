@@ -11,8 +11,7 @@ local EventListener = rope.Component:subclass('EventListener')
 -- @tparam string targetFunction the name of the target component's function
 -- to call on reaction to the event.
 function EventListener:initialize(arguments)
-    self:require(arguments, 'targetComponent', 'targetFunction')
-    self.event = arguments.event or ''
+    self:require(arguments, 'event', 'targetComponent', 'targetFunction')
     rope.Component.initialize(self, arguments)
 end
 

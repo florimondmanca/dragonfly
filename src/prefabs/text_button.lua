@@ -7,8 +7,7 @@ return {
         {
             script = 'rope.builtins.collision.aabb',
             arguments = {
-                collideGroup = '',
-                sizeFrom = 'rope.builtins.graphics.text_renderer'
+                sizeFrom = 'text'
             }
         },
         -- debug
@@ -16,7 +15,7 @@ return {
             script = 'rope.builtins.graphics.rectangle_renderer',
             arguments = {
                 mode = 'line',
-                sizeFrom = 'rope.builtins.graphics.text_renderer',
+                sizeFrom = 'text',
                 isDebug = true,
             }
         },

@@ -14,13 +14,13 @@ return {
             script = 'rope.builtins.collision.aabb',
             arguments = {
                 collideGroup = 'bullet',
-                sizeFromImage = true
+                sizeFrom = 'image'
             }
         },
         {
             script = 'rope.builtins.graphics.rectangle_renderer',
             arguments = {
-                sizeFromImage = true,
+                sizeFrom = 'image',
                 mode = 'line',
                 isDebug = true
             }

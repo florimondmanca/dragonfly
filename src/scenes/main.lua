@@ -1,5 +1,10 @@
 return {
     name = 'MainScene',
+    settings = {
+        graphics = {
+            backgroundColor = {150, 150, 200}
+        }
+    },
     gameObjects = {
         -- utilities : cameras, info renderers...
         {
@@ -13,7 +18,21 @@ return {
             components = {
                 {
                     script = 'rope.builtins.event.event_manager',
-                    arguments = {events = {'shoot', 'collision'}}
+                    arguments = {
+                        events = {
+                            'player-shoot',
+                            'enemy-shoot',
+                            'collision'
+                        }
+                    }
+                },
+                {
+                    script = 'rope.builtins.event.key_trigger',
+                    arguments = {event = 'player-shoot', key = 'space'}
+                },
+                {
+                    script = 'rope.builtins.event.collision_trigger',
+                    arguments = {event = 'collision'}
                 },
             },
         },
@@ -64,7 +83,7 @@ return {
                     script = 'rope.builtins.collision.aabb',
                     arguments = {
                         collideGroup = 'player',
-                        sizeFromImage = true
+                        sizeFrom = 'image'
                     }
                 },
                 -- define on collide behavior
@@ -80,29 +99,21 @@ return {
                 {
                     script = 'rope.builtins.graphics.rectangle_renderer',
                     arguments = {
-                        sizeFromImage = true,
+                        sizeFrom = 'image',
                         mode = 'line',
                         isDebug = true
                     }
                 },
-                -- events
-                {
-                    script = 'rope.builtins.event.key_trigger',
-                    arguments = {key = 'space', event = 'shoot'}
-                },
+                -- shoot on event player-shoot
                 {
                     script = 'rope.builtins.event.event_listener',
                     arguments = {
-                        event = 'shoot',
+                        event = 'player-shoot',
                         targetComponent = 'components.shooter',
                         targetFunction = 'shoot'
                     }
                 },
-                -- listen to collision events
-                {
-                    script = 'rope.builtins.event.collision_trigger',
-                    arguments = {event = 'collision'}
-                },
+                -- resolve collision on event collision
                 {
                     script = 'rope.builtins.event.event_listener',
                     arguments = {

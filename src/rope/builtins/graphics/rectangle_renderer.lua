@@ -3,13 +3,12 @@ local rope = require 'rope'
 local Component = rope.Component:subclass('RectangleRenderer')
 
 ----- initializes a rectangle renderer.
--- @tparam number width (required if sizeFromImage is false or nil)
--- @tparam number height (required if sizeFromImage is false or nil)
+-- @tparam number width (required if sizeFrom is false or nil)
+-- @tparam number height (required if sizeFrom is false or nil)
 -- @tparam table color the color of the rectangle (default is white).
 -- @tparam string mode 'fill' or 'line'.
--- @tparam bool sizeFromImage pass true to infer width and height from
--- owner's image (requires the owner to have a
--- rope.builtins.graphics.image_renderer component).
+-- @tparam string sizeFrom pass a script to infer width and height from
+-- owner's corresponding component
 function Component:initialize(arguments)
     if not arguments.sizeFrom then
         self:require(arguments, 'width', 'height')
@@ -20,8 +19,9 @@ function Component:initialize(arguments)
 end
 
 function Component:awake()
-    if self.sizeFrom then
-        local component = self.gameObject:getComponent(self.sizeFrom)
+    local sizeFrom = rope.sizeFromDefaults[self.sizeFrom] or self.sizeFrom
+    if sizeFrom then
+        local component = self.gameObject:getComponent(sizeFrom)
         self.width, self.height = component:getDimensions()
     end
 end

@@ -10,7 +10,7 @@ function Component:initialize(arguments)
 end
 
 function Component:onClick()
-    print('hello')
+    -- callback function
 end
 
 return Component

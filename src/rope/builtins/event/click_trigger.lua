@@ -5,8 +5,8 @@ local Trigger = rope.Component:subclass('ClickTrigger')
 ----- initializes a click trigger
 -- click triggers trigger events when mouse clicks on the trigger's area
 function Trigger:initialize(arguments)
-    self.event = arguments.event or ''
-    rope.Component.initialize(self)
+    self:require(arguments, 'event')
+    rope.Component.initialize(self, arguments)
 end
 
 function Trigger:worksWith()
