@@ -161,6 +161,23 @@ function middleclass.class(name, super)
   return super and super:subclass(name) or _includeMixin(_createClass(name), DefaultMixin)
 end
 
+--- tests if an object is an instance of a class and returns the corresponding class
+-- @param object
+-- @tparam varargs ... one or more classes
+function middleclass.isInstanceOf(object, ...)
+    local classes = {...}
+    if object.isInstanceOf then
+        local objectCls
+        for _, class in ipairs(classes) do
+            if object:isInstanceOf(class) then
+                return class
+            end
+        end
+        return false
+    else
+        return false
+    end
+
 setmetatable(middleclass, { __call = function(_, ...) return middleclass.class(...) end })
 
 return middleclass

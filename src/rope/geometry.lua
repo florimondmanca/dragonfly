@@ -2,7 +2,9 @@ local class = require 'rope.class'
 local asserts = require 'rope.asserts'
 
 
--- [[ Vector (2D) ]] --
+-----------------
+-- Vector (2D) --
+-----------------
 
 local Vector = class('Vector')
 
@@ -79,7 +81,9 @@ function Vector:project(direction)
 end
 
 
--- [[ Transform ]] --
+---------------
+-- Transform --
+---------------
 
 local Transform = class('Transform')
 
@@ -114,6 +118,9 @@ local Shape = class('Shape')
 
 local Circle = Shape:subclass('Circle')
 
+----- initializes a circle
+-- @tparam number radius > 0
+-- @tparam Vector center
 function Circle:initialize(radius, center)
     asserts.hasType('number', radius, 'radius')
     asserts.isInstanceOfOrNil(Shape, center, 'center')
@@ -200,9 +207,102 @@ function Rectangle:contains(vector)
 end
 
 
+------------------------------------
+-- Intersection testing functions --
+------------------------------------
+
+----- tests if two circles intersect
+local function intersectingCircles(cir1, cir2, transform1, transform2)
+    return (cir1:globalCenter(transform1) - cir2:globalCenter(transform2)):norm2() <= (cir1.radius + cir2.radius)^2
+end
+
+----- tests if two rectangles intersect
+local function intersectingRectangles(rect1, rect2, transform1, transform2)
+    rect1 = rect1:globalRectangle(transform1)
+    rect2 = rect2:globalRectangle(transform2)
+    return
+        rect2.origin.x - rect1.width <= rect1.origin.x
+        and rect1.origin.x <= rect2.origin.x + rect2.width
+        and rect2.origin.y - rect1.height <= rect1.origin.y
+        and rect1.origin.y <= rect2.origin.y + rect2.height
+end
+
+----- tests if a rectangle intersects with a circle
+local function intersectingRectangleAndCircle(rect, cir, transform1, transform2)
+    rect = rect:globalRectangle(transform1)
+    cir = cir:globalCircle(transform2)
+
+    for _, vertex in ipairs(rect:vertices()) do
+        if cir:contains(vertex) then return true end
+    end
+
+    return rect:contains(cir.center)
+end
+
+--- tests if two shapes interesect.
+-- supports points, axis-aligned rectangles and circles.
+-- @tparam Shape shape1
+-- @tparam Shape shape2
+-- @tparam Transform transform1
+-- @tparam Transform transform2
+local function intersecting(shape1, shape2, transform1, transform2)
+    assert(
+        class.isInstanceOf(shape1, Shape, Vector)
+        and class.isInstanceOf(shape2, Shape, Vector),
+        'both shapes must be instances of Shape or Vector'
+    )
+    transform1 = Transform(transform1)
+    transform2 = Transform(transform2)
+    local shape1Type = class.isInstanceOf(shape1, Vector, Rectangle, Circle)
+    local shape2Type = class.isInstanceOf(shape2, Vector, Rectangle, Circle)
+
+    -- intersection between a point and...
+    if shape1Type == Vector then
+        -- ... a point
+        if shape2Type == Vector then
+            shape1 = shape1 + transform1.position
+            shape2 = shape2 + transform2.position
+            return shape1.x == shape2.x and shape1.y == shape2.y
+        -- ... a circle
+        elseif shape2Type == Circle then
+            return shape2:contains(shape1)
+        -- ... a rectangle
+        elseif shape2Type == Rectangle then
+            return shape2:contains(shape1)
+        end
+
+    -- intersection between a rectangle and...
+    elseif shape1Type == Rectangle then
+        -- ... a point
+        if shape2Type == Vector then
+            return shape1:contains(shape2)
+        --- ... a circle
+        elseif shape2Type == Circle then
+            return intersectingRectangleAndCircle(shape1, shape2, transform1, transform2)
+        elseif shape2Type == Rectangle then
+            return intersectingRectangles(shape1, shape2, transform1, transform2)
+        end
+
+    -- intersection between a circle and ...
+    elseif shape1Type == Circle then
+        -- ... a point
+        if shape2Type == Vector then
+            return shape1:contains(shape2)
+        -- ... a circle
+        elseif shape2Type == Circle then
+            return intersectingCircles(shape1, shape2, transform1, transform2)
+        -- ... a rectangle
+        elseif shape2Type == Rectangle then
+            return intersectingRectangleAndCircle(shape2, shape1, transform2, transform1)
+        end
+    end
+end
+
+
 return {
     Vector = Vector,
     Transform = Transform,
     Circle = Circle,
     Rectangle = Rectangle,
+    intersecting = intersecting,
 }
