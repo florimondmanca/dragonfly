@@ -1,11 +1,5 @@
 local class = require 'rope.class'
-
-
-local function assertHaveXandY(...)
-    for _, a in ipairs{...} do
-        assert(a.x and a.y, 'both operands must have x and y fields defined')
-    end
-end
+local asserts = require 'rope.asserts'
 
 
 -- [[ Vector (2D) ]] --
@@ -22,12 +16,12 @@ function Vector:initialize(x, y)
 end
 
 function Vector.__add(a, b)
-    assertHaveXandY(a, b)
+    asserts.haveXandY(a, b)
     return Vector(a.x + b.x, a.y + b.y)
 end
 
 function Vector.__sub(a, b)
-    assertHaveXandY(a, b)
+    asserts.haveXandY(a, b)
     return Vector(a.x - b.x, a.y - b.y)
 end
 
@@ -42,7 +36,7 @@ function Vector.__mul(a, b)
         scalar = a
     end
 
-    assertHaveXandY(vector)
+    asserts.haveXandY(vector)
     assert(type(scalar) == 'number', 'cannot multiply vector and ' .. type(scalar))
     return Vector(scalar * vector.x, scalar * vector.y)
 end
@@ -52,7 +46,7 @@ function Vector:__tostring()
 end
 
 function Vector:norm2(origin)
-    if origin then assertHaveXandY(origin) end
+    if origin then asserts.haveXandY(origin) end
     local vec = self - Vector(origin)
     return vec.x^2 + vec.y^2
 end
@@ -75,12 +69,12 @@ function Vector:angle(useRadians)
 end
 
 function Vector:dot(other)
-    assertHaveXandY(other)
+    asserts.haveXandY(other)
     return self.x * other.x + self.y * other.y
 end
 
 function Vector:project(direction)
-    assertHaveXandY(direction)
+    asserts.haveXandY(direction)
     return (self:dot(direction) / direction:norm2()) * direction
 end
 
@@ -111,8 +105,104 @@ end
 -- Shapes --
 ------------
 
+local Shape = class('Shape')
+
+
+------------
+-- Circle --
+------------
+
+local Circle = Shape:subclass('Circle')
+
+function Circle:initialize(radius, center)
+    asserts.hasType('number', radius, 'radius')
+    asserts.isInstanceOfOrNil(Shape, center, 'center')
+    self.radius = radius
+    self.center = center or Vector()
+end
+
+function Circle:area()
+    return math.pi * self.radius^2
+end
+
+function Circle:circumference()
+    return 2*math.pi * self.radius
+end
+
+function Circle:globalCenter(transform)
+    return transform.position + self.center
+end
+
+function Circle:globalCircle(transform)
+    return Circle(self.radius * transform.size.x,
+        self:globalCenter(transform)
+    )
+end
+
+function Circle:contains(vector)
+    return (vector - self.center):norm2() <= self.radius^2
+end
+
+
+---------------
+-- Rectangle --
+---------------
+
+local Rectangle = Shape:subclass('Rectangle')
+
+----- initializes a Rectangle
+-- origin is assumed to be the topleft corner
+-- @tparam number width > 0
+-- @tparam number height > 0
+function Rectangle:initialize(width, height, origin)
+    asserts.isType('number', width, 'width')
+    asserts.isType('number', height, 'height')
+    asserts.isInstanceOfOrNil(Vector, origin, 'origin')
+    self.width = width
+    self.height = height
+    self.origin = origin or Vector()
+end
+
+function Rectangle:vertices()
+    return {
+        topleft = self.origin,
+        topright = self.origin + Vector(self.width, 0),
+        bottomleft = self.origin + Vector(0, self.height),
+        bottomright = self.origin + Vector(self.width, self.height),
+    }
+end
+
+function Rectangle:globalVertices(transform, ignoreRotation)
+	local globalVertices = {}
+	for position, vertex in pairs(self:vertices()) do
+		globalVertices[position] = Vector(vertex.x * transform.size.x, vertex.y * transform.size.y)
+		if not ignoreRotation then
+			globalVertices[position] = globalVertices[position]:rotate(transform.rotation) + transform.position
+		end
+	end
+	return globalVertices
+end
+
+function Rectangle:globalRectangle(transform)
+	return Rectangle(
+		self.width * transform.size.x,
+		self.height * transform.size.y,
+		self.origin + transform.position
+	)
+end
+
+function Rectangle:contains(vector)
+	return
+		vector.x >= self.origin.x and
+		vector.x <= self.origin.x + self.width and
+		vector.y >= self.origin.y and
+		vector.y <= self.origin.y + self.height
+end
+
 
 return {
     Vector = Vector,
     Transform = Transform,
+    Circle = Circle,
+    Rectangle = Rectangle,
 }

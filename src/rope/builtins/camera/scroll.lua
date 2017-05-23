@@ -1,11 +1,12 @@
 local rope = require 'rope'
+local asserts = require 'rope.asserts'
 
 -- Tag Component for scrolling camera
 local Component = rope.Component:subclass('ScrollCamera')
 
 function Component:initialize(arguments)
     self:require(arguments, 'axis', 'speed')
-    rope.assertIn({'x', 'y'}, arguments.axis, 'axis')
+    asserts.isIn({'x', 'y'}, arguments.axis, 'axis')
     rope.Component.initialize(self, arguments)
 end
 

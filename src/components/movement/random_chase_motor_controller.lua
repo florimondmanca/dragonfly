@@ -1,4 +1,5 @@
 local rope = require 'rope'
+local asserts = require 'rope.asserts'
 
 local Component = rope.Component:subclass('RandomChaseMotorController')
 
@@ -18,7 +19,7 @@ end
 -- @tparam number max between 0 and 1
 function Component:initialize(arguments)
     self:require(arguments, 'axis', 'motor_script')
-    rope.assertIn({'x', 'y'}, arguments.axis, 'axis')
+    asserts.isIn({'x', 'y'}, arguments.axis, 'axis')
     -- min and max allow to limit the amplitude of movement of the
     -- sprite on the screen (0 <= min, max <= 1)
     arguments.min = arguments.min or 0

@@ -1,39 +1,7 @@
 local class = require 'rope.class'
 local geometry = require 'rope.geometry'
 local collections = require 'rope.collections'
-
-
--------------------------
--- Auxiliary functions --
--------------------------
-
-local function assertIn(list, value, name)
-    name = name or 'value'
-    local isIn = false
-    for _, v in ipairs(list) do
-        if v == value then isIn = true end
-    end
-    assert(isIn, name .. ' must be one of ' .. table.concat(list, ', ') .. ', but was ' .. tostring(value))
-end
-
-local function assertType(desiredType, value, name)
-    name = name or 'value'
-    if type(value) ~= desiredType then
-        error(name .. ' must be a ' .. desiredType .. ', but was ' .. tostring(value) .. '(a ' .. type(value) .. ')')
-    end
-end
-
---- tests if a value is a strictly positive number.
--- @param value a value to test.
--- @tparam string name the name of the value (for error reporting).
--- @raise error if value is negative or zero.
-local function assertIsPositiveNumber(value, name)
-    name = name or 'value'
-    if type(value) ~=  'number' or value <= 0 then
-        error(name .. ' must be a positive integer, but was ' .. tostring(value) .. '(' .. type(value) .. ')')
-    end
-end
-
+local asserts = require 'rope.asserts'
 
 ---------------
 -- Component --
@@ -85,7 +53,7 @@ end
 -- @raise error if any of the required components is missing (with a list of all missing components)
 function Component:requireComponents()
     local worksWith = self:worksWith()
-    assertType('table', worksWith, 'worksWith')
+    asserts.hasType('table', worksWith, 'worksWith')
 
     local missing = {}
 
@@ -645,8 +613,5 @@ return {
     GameScene = GameScene,
     buildObject = buildObject,
     loadComponent = loadComponent,
-    assertIn = assertIn,
-    assertType = assertType,
-    assertIsPositiveNumber = assertIsPositiveNumber,
     sizeFromDefaults = sizeFromDefaults,
 }

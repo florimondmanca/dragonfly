@@ -1,10 +1,11 @@
 local rope = require 'rope'
+local asserts = require 'rope.asserts'
 
 local Component = rope.Component:subclass('InputMotorController')
 
 function Component:initialize(arguments)
     self:require(arguments, 'axis', 'keyPlus', 'keyMinus', 'motor_script')
-    rope.assertIn({'x', 'y'}, arguments.axis, 'axis')
+    asserts.isIn({'x', 'y'}, arguments.axis, 'axis')
     rope.Component.initialize(self, arguments)
 end
 
