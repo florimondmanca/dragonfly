@@ -26,7 +26,7 @@ function Component:awake()
     local sizeFrom = rope.sizeFromDefaults[self.sizeFrom] or self.sizeFrom
     if sizeFrom then
         local component = self.gameObject:getComponent(sizeFrom)
-        self.width, self.height = component:getDimensions()
+        self.width, self.height = component.shape.width, component.shape.height
     end
     -- build the rectangle shape
     self.shape = geometry.Rectangle(self.width, self.height, geometry.Vector(self.origin))

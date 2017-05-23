@@ -1,4 +1,5 @@
 local rope = require 'rope'
+local geometry = require 'rope.geometry'
 
 local Component = rope.Component:subclass('ImageRenderer')
 
@@ -8,9 +9,8 @@ function Component:initialize(arguments)
     self:require(arguments, 'filename')
     arguments = {image = love.graphics.newImage(arguments.filename)}
     rope.Component.initialize(self, arguments)
+    self.shape = geometry.Rectangle(self.image:getWidth(), self.image:getHeight())
 end
-
-function Component:getDimensions() return self.image:getDimensions() end
 
 function Component:draw()
     local pos = self.gameObject.globalTransform.position

@@ -1,7 +1,7 @@
 local rope = require 'rope'
 local collision = require 'rope.collision'
 
-local AABB_SCRIPT = 'rope.builtins.collision.aabb'
+local AABB_SCRIPT = 'rope.builtins.colliders.aabb'
 
 ----- initializes a collision trigger
 -- collision triggers trigger an event when the owner's AABB and another

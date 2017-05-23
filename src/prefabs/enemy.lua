@@ -35,7 +35,7 @@ return {
         },
         -- make sensible to collisions by adding an AABB
         {
-            script = 'rope.builtins.collision.aabb',
+            script = 'rope.builtins.colliders.aabb',
             arguments = {
                 collideGroup = 'enemy',
                 sizeFrom = 'image'
@@ -66,7 +66,7 @@ return {
             script = 'rope.builtins.event.event_listener',
             arguments = {
                 event = 'collision',
-                targetComponent = 'rope.builtins.collision.aabb',
+                targetComponent = 'rope.builtins.colliders.aabb',
                 targetFunction = 'resolve'
             }
         },

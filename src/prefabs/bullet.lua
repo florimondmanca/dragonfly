@@ -11,7 +11,7 @@ return {
         {script = 'components.die_out_of_screen'},
         -- collision AABB
         {
-            script = 'rope.builtins.collision.aabb',
+            script = 'rope.builtins.colliders.aabb',
             arguments = {
                 collideGroup = 'bullet',
                 sizeFrom = 'image'

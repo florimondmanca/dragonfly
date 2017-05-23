@@ -10,7 +10,7 @@ function Trigger:initialize(arguments)
 end
 
 function Trigger:worksWith()
-    return {aabb = {script = 'rope.builtins.collision.aabb'}}
+    return {aabb = {script = 'rope.builtins.colliders.aabb'}}
 end
 
 function Trigger:mousepressed(x, y, button)

@@ -1,6 +1,6 @@
 local rope = require 'rope'
 
-local AABB_SCRIPT = 'rope.builtins.collision.aabb'
+local AABB_SCRIPT = 'rope.builtins.colliders.aabb'
 
 local Component = rope.Component:subclass('DestroyOnCollide')
 

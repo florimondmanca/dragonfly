@@ -5,7 +5,7 @@ return {
             arguments = {text = 'Button'}
         },
         {
-            script = 'rope.builtins.collision.aabb',
+            script = 'rope.builtins.colliders.aabb',
             arguments = {
                 sizeFrom = 'text'
             }
