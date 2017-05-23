@@ -12,7 +12,7 @@ return {
             components = {
                 {
                     script = 'rope.builtins.graphics.rectangle_renderer',
-                    arguments = {width = 200, height = 100}
+                    arguments = {width = 200, height = 100},
                 }
             }
         },

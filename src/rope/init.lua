@@ -458,12 +458,16 @@ local function buildObject(scene, object, trackObject)
         end
     end
     -- add components
-    for _, componentTable in ipairs(object.components) do
-        gameObject:buildAndAddComponent(componentTable)
+    for _, component in ipairs(object.components) do
+        if scene.settings.debug or not component.isDebug then
+            gameObject:buildAndAddComponent(component)
+        end
     end
     -- add children
     for _, child in ipairs(object.children or {}) do
-        gameObject:addChild(buildObject(scene, child))
+        if scene.settings.debug or not child.isDebug then
+            gameObject:addChild(buildObject(scene, child))
+        end
     end
     return gameObject
 end
