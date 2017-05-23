@@ -38,7 +38,7 @@ return {
             script = 'rope.builtins.colliders.aabb',
             arguments = {
                 collideGroup = 'enemy',
-                sizeFrom = 'image'
+                dimsFrom = 'image'
             }
         },
         {
@@ -52,7 +52,7 @@ return {
         {
             script = 'rope.builtins.graphics.rectangle_renderer',
             arguments = {
-                sizeFrom = 'image',
+                dimsFrom = 'image',
                 mode = 'line',
                 isDebug = true
             }

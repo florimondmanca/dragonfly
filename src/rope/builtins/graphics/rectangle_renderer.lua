@@ -4,15 +4,15 @@ local geometry = require 'rope.geometry'
 local Component = rope.Component:subclass('RectangleRenderer')
 
 ----- initializes a rectangle renderer.
--- @tparam number width (required if sizeFrom is false or nil)
--- @tparam number height (required if sizeFrom is false or nil)
+-- @tparam number width (required if dimsFrom is false or nil)
+-- @tparam number height (required if dimsFrom is false or nil)
 -- @tparam table origin as {x=<x>, y=<y>} (optional)
 -- @tparam table color the color of the rectangle (optional, default white).
 -- @tparam string mode 'fill' or 'line' (optional, default 'fill')
--- @tparam string sizeFrom pass a script to infer width and height from
+-- @tparam string dimsFrom pass a script to infer width and height from
 -- owner's corresponding component
 function Component:initialize(arguments)
-    if not arguments.sizeFrom then
+    if not arguments.dimsFrom then
         self:require(arguments, 'width', 'height')
     end
     arguments.origin = geometry.Vector(arguments.origin)
@@ -23,9 +23,9 @@ end
 
 function Component:awake()
     -- infer size from a component if necessary
-    local sizeFrom = rope.sizeFromDefaults[self.sizeFrom] or self.sizeFrom
-    if sizeFrom then
-        local component = self.gameObject:getComponent(sizeFrom)
+    local dimsFrom = rope.dimsFromDefaults[self.dimsFrom] or self.dimsFrom
+    if dimsFrom then
+        local component = self.gameObject:getComponent(dimsFrom)
         self.width, self.height = component.shape.width, component.shape.height
     end
     -- build the rectangle shape

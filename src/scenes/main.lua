@@ -83,7 +83,7 @@ return {
                     script = 'rope.builtins.colliders.aabb',
                     arguments = {
                         collideGroup = 'player',
-                        sizeFrom = 'image'
+                        dimsFrom = 'image'
                     }
                 },
                 -- define on collide behavior
@@ -99,7 +99,7 @@ return {
                 {
                     script = 'rope.builtins.graphics.rectangle_renderer',
                     arguments = {
-                        sizeFrom = 'image',
+                        dimsFrom = 'image',
                         mode = 'line',
                         isDebug = true
                     }

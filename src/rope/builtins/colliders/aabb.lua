@@ -4,7 +4,7 @@ local collision = require 'rope.collision'
 local Component = rope.Component:subclass('AABB')
 
 function Component:initialize(arguments)
-    if not arguments.sizeFrom then
+    if not arguments.dimsFrom then
         self:require(arguments, 'width', 'height')
     end
     arguments.collideGroup = arguments.collideGroup or ''
@@ -12,9 +12,9 @@ function Component:initialize(arguments)
 end
 
 function Component:awake()
-    local sizeFrom = rope.sizeFromDefaults[self.sizeFrom] or self.sizeFrom
-    if sizeFrom then
-        local component = self.gameObject:getComponent(sizeFrom)
+    local dimsFrom = rope.dimsFromDefaults[self.dimsFrom] or self.dimsFrom
+    if dimsFrom then
+        local component = self.gameObject:getComponent(dimsFrom)
         self.width, self.height = component.shape.width, component.shape.height
     end
 end

@@ -604,7 +604,7 @@ function GameScene:draw()
 end
 
 
-local sizeFromDefaults = {
+local dimsFromDefaults = {
     image = 'rope.builtins.graphics.image_renderer',
     text = 'rope.builtins.graphics.text_renderer',
     rectangle = 'rope.builtins.graphics.rectangle_renderer',
@@ -617,5 +617,5 @@ return {
     GameScene = GameScene,
     buildObject = buildObject,
     loadComponent = loadComponent,
-    sizeFromDefaults = sizeFromDefaults,
+    dimsFromDefaults = dimsFromDefaults,
 }

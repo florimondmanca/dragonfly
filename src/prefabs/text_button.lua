@@ -7,7 +7,7 @@ return {
         {
             script = 'rope.builtins.colliders.aabb',
             arguments = {
-                sizeFrom = 'text'
+                dimsFrom = 'text'
             }
         },
         -- debug
@@ -15,7 +15,7 @@ return {
             script = 'rope.builtins.graphics.rectangle_renderer',
             arguments = {
                 mode = 'line',
-                sizeFrom = 'text',
+                dimsFrom = 'text',
                 isDebug = true,
             }
         },
