@@ -167,7 +167,6 @@ end
 function middleclass.isInstanceOf(object, ...)
     local classes = {...}
     if object.isInstanceOf then
-        local objectCls
         for _, class in ipairs(classes) do
             if object:isInstanceOf(class) then
                 return class
@@ -177,6 +176,7 @@ function middleclass.isInstanceOf(object, ...)
     else
         return false
     end
+end
 
 setmetatable(middleclass, { __call = function(_, ...) return middleclass.class(...) end })
 

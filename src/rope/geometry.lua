@@ -123,7 +123,7 @@ local Circle = Shape:subclass('Circle')
 -- @tparam Vector center
 function Circle:initialize(radius, center)
     asserts.hasType('number', radius, 'radius')
-    asserts.isInstanceOfOrNil(Shape, center, 'center')
+    asserts.isInstanceOfOrNil(Vector, center, 'center')
     self.radius = radius
     self.center = center or Vector()
 end
@@ -162,8 +162,8 @@ local Rectangle = Shape:subclass('Rectangle')
 -- @tparam number width > 0
 -- @tparam number height > 0
 function Rectangle:initialize(width, height, origin)
-    asserts.isType('number', width, 'width')
-    asserts.isType('number', height, 'height')
+    asserts.hasType('number', width, 'width')
+    asserts.hasType('number', height, 'height')
     asserts.isInstanceOfOrNil(Vector, origin, 'origin')
     self.width = width
     self.height = height
