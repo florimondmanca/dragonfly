@@ -13,7 +13,7 @@ local EventListener = rope.Component:subclass('EventListener')
 function EventListener:initialize(arguments)
     self:require(arguments, 'targetComponent', 'targetFunction')
     self.event = arguments.event or ''
-    rope.Component.initialize(self)
+    rope.Component.initialize(self, arguments)
 end
 
 function EventListener:awake()

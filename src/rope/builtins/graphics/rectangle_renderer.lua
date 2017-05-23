@@ -11,7 +11,7 @@ local Component = rope.Component:subclass('RectangleRenderer')
 -- owner's image (requires the owner to have a
 -- rope.builtins.graphics.image_renderer component).
 function Component:initialize(arguments)
-    if not arguments.sizeFromImage then
+    if not arguments.sizeFrom then
         self:require(arguments, 'width', 'height')
     end
     arguments.color = arguments.color or {255, 255, 255}
@@ -20,11 +20,9 @@ function Component:initialize(arguments)
 end
 
 function Component:awake()
-    if self.sizeFromImage then
-        local image = self.gameObject:getComponent(
-            'rope.builtins.graphics.image_renderer').image
-        self.width = image:getWidth()
-        self.height = image:getHeight()
+    if self.sizeFrom then
+        local component = self.gameObject:getComponent(self.sizeFrom)
+        self.width, self.height = component:getDimensions()
     end
 end
 

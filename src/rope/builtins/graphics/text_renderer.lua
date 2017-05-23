@@ -9,11 +9,16 @@ function Component:initialize(arguments)
     arguments.color = arguments.color or {255, 255, 255, 255}
     arguments.text = arguments.text or ''
     rope.Component.initialize(self, arguments)
+    self.font = love.graphics.getFont()
+    self.textObject = love.graphics.newText(self.font, self.text)
 end
 
 function Component:setText(text)
-    self.text = text
+    self.text = text or self.text
+    self.textObject:set(self.text)
 end
+
+function Component:getDimensions() return self.textObject:getDimensions() end
 
 function Component:draw()
     love.graphics.setColor(self.color)

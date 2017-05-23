@@ -82,7 +82,15 @@ local function collideRect(rect1, rect2)
     return collided
 end
 
+local function containsPoint(rect, x, y)
+    local collided = (
+        rect.x < x and x < rect.x + rect.w
+        and rect.y < y and y < rect.y + rect.h)
+    return collided
+end
+
 
 return {
     collideRect = collideRect,
+    containsPoint = containsPoint,
 }

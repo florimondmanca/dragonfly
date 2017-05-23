@@ -1,22 +1,20 @@
 local rope = require 'rope'
+local collision = require 'rope.collision'
 
 local Component = rope.Component:subclass('AABB')
 
 function Component:initialize(arguments)
-    if not arguments.sizeFromImage then
+    if not arguments.sizeFrom then
         self:require(arguments, 'width', 'height')
-        arguments.sizeFromImage = false
     end
     self:require(arguments, 'collideGroup')
     rope.Component.initialize(self, arguments)
 end
 
 function Component:awake()
-    if self.sizeFromImage then
-        local image = self.gameObject:getComponent(
-            'rope.builtins.graphics.image_renderer').image
-        self.width = image:getWidth()
-        self.height = image:getHeight()
+    if self.sizeFrom then
+        local component = self.gameObject:getComponent(self.sizeFrom)
+        self.width, self.height = component:getDimensions()
     end
 end
 
@@ -25,6 +23,14 @@ end
 -- @tparam GameObject other
 function Component:resolve()
     -- callback function
+end
+
+--- tests if a point is inside the AABB
+-- @tparam number x
+-- @tparam number y
+-- @return true if (x, y) is inside the AABB, false otherwise
+function Component:contains(x, y)
+    return collision.containsPoint(self:getAABB(), x, y)
 end
 
 function Component:getAABB()

@@ -18,7 +18,7 @@ return {
             components = {
                 {
                     script = 'rope.builtins.event.event_manager',
-                    arguments = {events = {'start'}}
+                    arguments = {events = {'start', 'click'}}
                 },
             }
         },
@@ -34,5 +34,23 @@ return {
                 }
             }
         },
+        -- buttons
+        {
+            name = 'Button 1',
+            transform = {position = {x = love.graphics.getWidth()/2, y = 300}},
+            prefab = 'prefabs.text_button',
+            prefabComponents = {
+                {
+                    script = 'rope.builtins.graphics.text_renderer',
+                    arguments = {text = 'Play'}
+                },
+                {
+                    script = 'rope.builtins.event.on_click',
+                    arguments = {onClick = function (self)
+                        print('Clicked play!')
+                    end}
+                },
+            }
+        }
     },
 }

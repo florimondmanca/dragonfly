@@ -10,6 +10,8 @@ function Component:initialize(arguments)
     rope.Component.initialize(self, arguments)
 end
 
+function Component:getDimensions() return self.image:getDimensions() end
+
 function Component:draw()
     local pos = self.gameObject.globalTransform.position
     love.graphics.setColor(255, 255, 255)

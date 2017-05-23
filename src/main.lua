@@ -18,6 +18,10 @@ function love.draw(...)
     scene.draw(scene, ...)
 end
 
+function love.mousepressed(...)
+    scene.mousepressed(scene, ...)
+end
+
 function love.keypressed(...)
     scene.keypressed(scene, ...)
 end
