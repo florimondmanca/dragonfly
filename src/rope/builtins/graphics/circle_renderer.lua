@@ -4,8 +4,8 @@ local Component = rope.Component:subclass('CircleRenderer')
 
 ----- initializes a circle renderer
 -- @tparam number radius in pixels (required)
--- @tparam table color color of the circle
--- @tparam string mode 'fill' or 'line'
+-- @tparam table color color of the circle (default white)
+-- @tparam string mode 'fill' or 'line' (defaut 'fill')
 function Component:initialize(arguments)
     self:require(arguments, 'radius')
     arguments.color = arguments.color or {255, 255, 255}

@@ -207,6 +207,177 @@ function Rectangle:contains(vector)
 end
 
 
+-------------
+-- Polygon --
+-------------
+
+----- tests collision between a polygon and something else
+local function intersectingPolygonAndOther(poly1, other, transform1, transform2)
+	transform1 = transform1 or Transform()
+
+	local poly1Verts = poly1:globalVertices(transform1)
+	local otherVerts
+	local otherType = class.isInstanceOf(other, Vector, Circle)
+	if otherType == Vector then
+		otherVerts = {other}
+	elseif otherType == Circle then
+		local gc = other:globalCircle(transform2)
+		--we will rotate the "vertices" (center and two outmost points) on each new axis
+		otherVerts = {
+			gc.center - Vector(gc.radius, 0),
+			gc.center,
+			gc.center + Vector(gc.radius, 0)
+		}
+	else
+		otherVerts = other:globalVertices(transform2)
+	end
+
+	--check against every axis of both colliders
+	--if collider is polygon, axis is normal of a side
+	--if collider is circle, axis is the line between the closest polygon vertex and the circle center
+	for icollider, collider in ipairs({poly1Verts, otherVerts}) do
+		local len = #collider
+
+		--if the 2nd collider has only one vertex, we've already checked it
+		if len < 2 and icollider == 2 then
+			return true
+		end
+
+		local normal = nil
+		local minSm = nil
+		local closest = nil
+
+		--if this collider is a circle, we generate the "normal" here
+		if icollider == 2 and otherType == Circle then
+			for _, vertex in ipairs(poly1Verts) do
+				local sm = (vertex - other:globalCenter(transform2)):sqrMagnitude()
+				if not minSm or sm <= minSm then
+					minSm = sm
+					closest = vertex
+				end
+			end
+			normal = other:globalCenter(transform2) - closest
+		end
+
+		--if this is a polygon, we will check each side
+		--if this is not a polygon, we will break at the end of the loop
+		for i, vertex in ipairs(collider) do
+			if icollider == 1 or otherType ~= Circle then
+				normal = Vector.rotate(collider[i%len + 1] - vertex, 90)
+			end
+
+			--the vector might be (0,0) if the 2nd collider is a circle,
+			--and the 1st collider is touching its center
+			if normal.x == 0 and normal.y == 0 then
+				return true
+			end
+
+			local normalAngle = normal:angle()
+
+			local minPoint1 = nil
+			local maxPoint1 = nil
+
+			--project the first collider's vertices against the normal
+			for _, vertex2 in ipairs(poly1Verts) do
+				local projected = vertex2:project(normal)
+				local adjustedProjected = projected:rotate(normalAngle)
+
+				if not minPoint1 then
+					minPoint1 = adjustedProjected
+				end
+
+				if not maxPoint1 then
+					maxPoint1 = adjustedProjected
+				elseif adjustedProjected.x < minPoint1.x then
+					minPoint1 = adjustedProjected
+				elseif adjustedProjected.x > maxPoint1.x then
+					maxPoint1 = adjustedProjected
+				end
+			end
+
+			local minPoint2 = nil
+			local maxPoint2 = nil
+
+			--project the second collider's vertices against the normal
+			for _, vertex2 in ipairs(otherVerts) do
+				local projected = vertex2:project(normal)
+				local adjustedProjected = projected:rotate(normalAngle)
+
+				if not minPoint2 then
+					minPoint2 = adjustedProjected
+				end
+
+				if not maxPoint2 then
+					maxPoint2 = adjustedProjected
+				elseif adjustedProjected.x < minPoint2.x then
+					minPoint2 = adjustedProjected
+				elseif adjustedProjected.x > maxPoint2.x then
+					maxPoint2 = adjustedProjected
+				end
+			end
+
+			local points = {{minPoint1,1}, {minPoint2,2}, {maxPoint1,1}, {maxPoint2,2}}
+			table.sort(points, function(a,b) return a[1].x < b[1].x end)
+
+			--if the first two sorted points are from the same collider, we've found a gap
+			--(unless the min of one is exactly the max of the other)
+			if points[1][2] == points[2][2] and points[2][1].x ~= points[3][1].x then
+				return false
+			end
+
+			--if this is a circle, there is only one "normal" to check, so we can break now
+			if icollider == 2 and otherType == Circle then
+				break
+			end
+		end
+	end
+
+	--if no gaps have been found, there must be a collision
+	return true
+end
+
+local Polygon = Shape:subclass('Polygon')
+
+function Polygon:initialize(vertices)
+	local originalVType = type(vertices[1])
+	local newVerts = {}
+
+	for i, v in ipairs(vertices) do
+		--ensure type consistency
+		if i ~= 1 then
+			assert(type(v) == originalVType, "vertices must be all nums or all tables")
+		end
+
+		if originalVType == "number" and i % 2 == 1 then
+			newVerts[math.floor(i/2) + 1] = Vector(v, vertices[i+1])
+		elseif originalVType == "table" then
+			newVerts[i] = Vector(v)
+		end
+	end
+	self.vertices = newVerts
+end
+
+function Polygon:globalVertices(transform)
+    local globalVertices = {}
+    for i, vertex in ipairs(self.vertices) do
+        globalVertices[i] = Vector(vertex.x * transform.size.x, vertex.y * transform.size.y)
+        if transform.rotation ~= 0 then
+            globalVertices[i] = globalVertices[i]:rotate(transform.rotation) + transform.position
+        end
+	end
+
+	return globalVertices
+end
+
+function Polygon:globalPolygon(transform)
+	return Polygon(self:globalVertices(transform))
+end
+
+function Polygon:contains(vector)
+	return intersectingPolygonAndOther(self, vector)
+end
+
+
 ------------------------------------
 -- Intersection testing functions --
 ------------------------------------
