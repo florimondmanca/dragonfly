@@ -9,6 +9,10 @@ function Component:initialize(arguments)
     self.onClick = arguments.onClick
 end
 
+function Component:worksWith()
+    return {collider = {script = 'rope.builtins.colliders._collider'}}
+end
+
 function Component:onClick()
     -- callback function
 end

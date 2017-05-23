@@ -20,6 +20,10 @@ return {
                     script = 'rope.builtins.event.event_manager',
                     arguments = {events = {'start', 'click'}}
                 },
+                {
+                    script = 'rope.builtins.event.click_trigger',
+                    arguments = {event = 'click'}
+                },
             }
         },
         {
@@ -47,8 +51,11 @@ return {
                 {
                     script = 'rope.builtins.event.on_click',
                     arguments = {onClick = function (self)
-                        print('Clicked play')
-                        self.gameScene:load('scenes/main.lua')
+                        local x, y = self.gameScene.camera:mousePosition()
+                        if self.collider.shape:contains({x=x, y=y}) then
+                            print('Clicked play')
+                            self.gameScene:load('scenes/main.lua')
+                        end
                     end}
                 },
             }

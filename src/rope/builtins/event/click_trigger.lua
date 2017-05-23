@@ -9,12 +9,8 @@ function Trigger:initialize(arguments)
     rope.Component.initialize(self, arguments)
 end
 
-function Trigger:worksWith()
-    return {collider = {script = 'rope.builtins.colliders.rectangle_collider'}}
-end
-
-function Trigger:mousepressed(x, y, button)
-    if button == 1 and self.collider:contains(x, y) then
+function Trigger:mousepressed(_, _, button)
+    if button == 1 then
         local e = self.globals.events[self.event]
         assert(e, 'Trigger could not find event ' .. self.event)
         e:trigger(self)

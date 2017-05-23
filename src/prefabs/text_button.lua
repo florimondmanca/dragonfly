@@ -19,11 +19,6 @@ return {
                 isDebug = true,
             }
         },
-        -- click trigger
-        {
-            script = 'rope.builtins.event.click_trigger',
-            arguments = {event = 'click'}
-        },
         -- click listener
         {
             script = 'rope.builtins.event.event_listener',
@@ -36,9 +31,11 @@ return {
         -- click action
         {
             script = 'rope.builtins.event.on_click',
-            arguments = {onClick = function (self)
-                print('Clicked!')
-            end}
+            arguments = {
+                onClick = function (self)
+                    print('Clicked!')
+                end
+            }
         },
     }
 }
