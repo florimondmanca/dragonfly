@@ -5,9 +5,9 @@ return {
             arguments = {text = 'Button'}
         },
         {
-            script = 'rope.builtins.colliders.aabb',
+            script = 'rope.builtins.colliders.rectangle_collider',
             arguments = {
-                dimsFrom = 'text'
+                dimsFrom = 'rope.builtins.graphics.text_renderer'
             }
         },
         -- debug
@@ -15,7 +15,7 @@ return {
             script = 'rope.builtins.graphics.rectangle_renderer',
             arguments = {
                 mode = 'line',
-                dimsFrom = 'text',
+                dimsFrom = 'rope.builtins.graphics.text_renderer',
                 isDebug = true,
             }
         },

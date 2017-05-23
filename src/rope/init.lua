@@ -57,7 +57,7 @@ function Component:requireComponents()
 
     local missing = {}
 
-    for name, entry in pairs(self:worksWith()) do
+    for name, entry in pairs(worksWith) do
         local script, filter = entry.script, entry.filter
         assert(script, 'missing script in worksWith declaration of ' .. self.class.name)
         local component = self.gameObject:getComponent(script, filter)

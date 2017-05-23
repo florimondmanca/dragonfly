@@ -1,7 +1,6 @@
 local rope = require 'rope'
-local collision = require 'rope.collision'
 
-local AABB_SCRIPT = 'rope.builtins.colliders.aabb'
+local COLLIDER_SCRIPT = 'rope.builtins.colliders.rectangle_collider'
 
 ----- initializes a collision trigger
 -- collision triggers trigger an event when the owner's AABB and another
@@ -16,12 +15,12 @@ end
 
 function Trigger:update()
     for _, o1 in ipairs(self.gameScene.gameObjects) do
-        local aabb1 = o1:getComponent(AABB_SCRIPT)
-        if aabb1 then
+        local col1 = o1:getComponent(COLLIDER_SCRIPT)
+        if col1 then
             for _, o2 in ipairs(self.gameScene.gameObjects) do
-                local aabb2 = o2:getComponent(AABB_SCRIPT)
-                if aabb2 and o1 ~= o2 then
-                    if collision.collideRect(aabb1:get(), aabb2:get()) then
+                local col2 = o2:getComponent(COLLIDER_SCRIPT)
+                if col2 and o1 ~= o2 then
+                    if col1:collidesWith(col2) then
                         -- trigger an event on collision
                         local e = self.globals.events[self.event]
                         assert(e, 'Trigger could not find event ' .. self.event ..

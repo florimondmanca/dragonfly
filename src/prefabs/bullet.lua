@@ -9,18 +9,18 @@ return {
             -- give filename
         },
         {script = 'components.die_out_of_screen'},
-        -- collision AABB
+        -- rectangle collider
         {
-            script = 'rope.builtins.colliders.aabb',
+            script = 'rope.builtins.colliders.rectangle_collider',
             arguments = {
                 collideGroup = 'bullet',
-                dimsFrom = 'image'
+                dimsFrom = 'rope.builtins.graphics.image_renderer'
             }
         },
         {
             script = 'rope.builtins.graphics.rectangle_renderer',
             arguments = {
-                dimsFrom = 'image',
+                dimsFrom = 'rope.builtins.graphics.image_renderer',
                 mode = 'line',
                 isDebug = true
             }

@@ -78,12 +78,11 @@ return {
                     }
                 },
                 -- collision
-                -- create an AABB
+                -- collider
                 {
-                    script = 'rope.builtins.colliders.aabb',
+                    script = 'rope.builtins.colliders.rectangle_collider',
                     arguments = {
-                        collideGroup = 'player',
-                        dimsFrom = 'image'
+                        dimsFrom = 'rope.builtins.graphics.image_renderer',
                     }
                 },
                 -- define on collide behavior
@@ -95,11 +94,20 @@ return {
                         }
                     }
                 },
+                -- resolve collision on event collision
+                {
+                    script = 'rope.builtins.event.event_listener',
+                    arguments = {
+                        event = 'collision',
+                        targetComponent = 'components.collision.destroy_on_collide',
+                        targetFunction = 'resolve'
+                    }
+                },
                 -- add AABB debug rectangle
                 {
                     script = 'rope.builtins.graphics.rectangle_renderer',
                     arguments = {
-                        dimsFrom = 'image',
+                        dimsFrom = 'rope.builtins.graphics.image_renderer',
                         mode = 'line',
                         isDebug = true
                     }
@@ -111,15 +119,6 @@ return {
                         event = 'player-shoot',
                         targetComponent = 'components.shooter',
                         targetFunction = 'shoot'
-                    }
-                },
-                -- resolve collision on event collision
-                {
-                    script = 'rope.builtins.event.event_listener',
-                    arguments = {
-                        event = 'collision',
-                        targetComponent = 'rope.builtins.colliders.aabb',
-                        targetFunction = 'resolve'
                     }
                 },
                 -- camera

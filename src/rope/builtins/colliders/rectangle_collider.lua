@@ -20,7 +20,7 @@ function Component:initialize(arguments)
         self:require(arguments, 'width', 'height')
         arguments.shape = geometry.Rectangle(arguments.width, arguments.height, arguments.origin)
     else
-        arguments.shape = geometry.Rectangle()
+        arguments.shape = geometry.Rectangle(1, 1)
     end
     arguments.width, arguments.height = nil, nil
     rope.Component.initialize(self, arguments)
@@ -29,7 +29,7 @@ end
 function Component:awake()
     if self.dimsFrom then
         local source = self.gameObject:getComponent(self.dimsFrom)
-        asserts.isInstanceOf(geometry.Rectangle, source, 'source shape')
+        asserts.isInstanceOf(geometry.Rectangle, source.shape, 'source shape')
         local width, height = source.shape.width, source.shape.height
         self.shape = geometry.Rectangle(width, height, self.origin)
     end

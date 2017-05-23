@@ -33,12 +33,12 @@ return {
             script = 'components.random_shoot_controller',
             arguments = {meanWaitTime = 3, waitTimeSigma = 1}
         },
-        -- make sensible to collisions by adding an AABB
+        -- collision
         {
-            script = 'rope.builtins.colliders.aabb',
+            script = 'rope.builtins.colliders.rectangle_collider',
             arguments = {
                 collideGroup = 'enemy',
-                dimsFrom = 'image'
+                dimsFrom = 'rope.builtins.graphics.image_renderer'
             }
         },
         {
@@ -52,21 +52,17 @@ return {
         {
             script = 'rope.builtins.graphics.rectangle_renderer',
             arguments = {
-                dimsFrom = 'image',
+                dimsFrom = 'rope.builtins.graphics.image_renderer',
                 mode = 'line',
                 isDebug = true
             }
         },
         -- catch collision events
         {
-            script = 'rope.builtins.event.collision_trigger',
-            arguments = {event = 'collision'}
-        },
-        {
             script = 'rope.builtins.event.event_listener',
             arguments = {
                 event = 'collision',
-                targetComponent = 'rope.builtins.colliders.aabb',
+                targetComponent = 'components.collision.destroy_on_collide',
                 targetFunction = 'resolve'
             }
         },
