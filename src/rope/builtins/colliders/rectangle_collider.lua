@@ -34,7 +34,16 @@ function Component:awake()
         local width, height = source.shape.width, source.shape.height
         self.shape = geometry.Rectangle(width, height, self.origin)
     end
+    -- add debug rectangle renderer
+    self.gameObject:buildAndAddComponent({
+        script = 'rope.builtins.graphics.rectangle_renderer',
+        arguments = {
+            color = {255, 255, 0},
+            mode = 'line',
+            dimsFrom = 'rope.builtins.colliders.rectangle_collider',
+            isDebug = true
+        }
+    })
 end
-
 
 return Component

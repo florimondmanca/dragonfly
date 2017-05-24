@@ -13,11 +13,9 @@ end
 function Component:awake()
     local collider = self.gameObject:getComponent(COLLIDER_SCRIPT)
     if collider then
-        collider.addCollision = function (self, other)
+        collider.acceptsCollisionWith = function (self, other)
             local source = self.gameObject.source
-            if not source or source ~= other.gameObject then
-                self:newCollision(other)
-            end
+            return not source or source ~= other.gameObject
         end
     end
 end

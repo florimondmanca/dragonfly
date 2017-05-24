@@ -330,11 +330,14 @@ end
 
 --- build a component from its table representation and adds it to the game object
 -- @tparam table componentTable table representation of a component
-function GameObject:buildAndAddComponent(componentTable)
-    local componentClass = require(componentTable.script)
+function GameObject:buildAndAddComponent(component)
+    if not self.gameScene.settings.debug and component.isDebug then
+        return
+    end
+    local componentClass = require(component.script)
     assert(componentClass.isSubclassOf and
-    componentClass:isSubclassOf(Component), 'Script ' .. componentTable.script .. ' does not return a Component')
-    return self:addComponent(componentClass(componentTable.arguments or {}))
+    componentClass:isSubclassOf(Component), 'Script ' .. component.script .. ' does not return a Component')
+    return self:addComponent(componentClass(component.arguments or {}))
 end
 
 --- gets one component of a game object based on its type.
@@ -459,9 +462,7 @@ local function buildObject(scene, object, trackObject)
     end
     -- add components
     for _, component in ipairs(object.components) do
-        if scene.settings.debug or not component.isDebug then
-            gameObject:buildAndAddComponent(component)
-        end
+        gameObject:buildAndAddComponent(component)
     end
     -- add children
     for _, child in ipairs(object.children or {}) do

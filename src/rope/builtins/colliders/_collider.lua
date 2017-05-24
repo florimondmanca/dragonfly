@@ -16,31 +16,51 @@ function Collider:initialize(arguments)
     self.collisions = {}
 end
 
------ creates a new collision with a collider
-function Collider:newCollision(other)
-    self.collisions[other] = {resolved = false}
-end
-
+----- closes a collision.
+-- NOTE: should be called once a collision is resolved (e.g. in a resolver)
+-- @tparam Collider collider
 function Collider:resolved(collider)
     self.collisions[collider].resolved = true
-    print('resolved collision with', collider.gameObject.name)
+    collider.collisions[self].resolved = true
+end
+
+function Collider:newCollision(collider)
+    self.collisions[collider] = {resolved = false}
 end
 
 ----- registers a collision with another collider for the current time frame.
--- you may override this in specialized components to, for example, filter
--- the collisions based on some condition
--- @tparam Collider other
-function Collider:addCollision(other)
-    self:newCollision(other)
+-- NOTE: you may override this in specialized components to, for example,
+-- filter the collisions based on some condition.
+-- @tparam Collider collider
+function Collider:addCollision(collider)
+    if self:acceptsCollisionWith(collider)
+    and collider:acceptsCollisionWith(self) then
+        self:newCollision(collider)
+        collider:newCollision(self)
+    end
+end
+
+----- callback function for collision acceptance
+-- must return true if collision with given other collider is accepted, false otherwise.
+-- returns true by default.
+-- @tparam Collider otherCollider
+function Collider:acceptsCollisionWith()
+    -- callback
+    return true
 end
 
 ----- updates the collider by removing resolved collisions.
 function Collider:update()
-    local collisions = {}
+    -- local collisions = {}
+    -- for collider, collision in pairs(self.collisions) do
+    --     if not collision.resolved then
+    --         collisions[collider] = collision
+    --     end
+    -- end
+    -- self.collisions = collisions
     for collider, collision in pairs(self.collisions) do
-        if not collision.resolved then collisions[collider] = collision end
+        if collision.resolved then self.collisions[collider] = nil end
     end
-    self.collisions = collisions
 end
 
 ----- tests if collider collides with another collider, shape or point.

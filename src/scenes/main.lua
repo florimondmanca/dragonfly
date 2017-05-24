@@ -72,28 +72,20 @@ return {
                         filename = 'static/img/bullet-right.png',
                     }
                 },
-                -- collision
-                {
-                    script = 'rope.builtins.colliders.rectangle_collider',
-                    arguments = {
-                        dimsFrom = 'rope.builtins.graphics.image_renderer',
-                    }
-                },
-                {
-                    script = 'rope.builtins.graphics.rectangle_renderer',
-                    arguments = {
-                        dimsFrom = 'rope.builtins.graphics.image_renderer',
-                        mode = 'line',
-                        isDebug = true
-                    }
-                },
-                -- shoot on event player_shoot
+                -- shooting : shoot on event player_shoot
                 {
                     script = 'rope.builtins.event.event_listener',
                     arguments = {
                         event = 'player_shoot',
                         targetComponent = 'components.shooter',
                         targetFunction = 'shoot'
+                    }
+                },
+                -- collision
+                {
+                    script = 'rope.builtins.colliders.rectangle_collider',
+                    arguments = {
+                        dimsFrom = 'rope.builtins.graphics.image_renderer',
                     }
                 },
                 -- camera

@@ -9,10 +9,12 @@ local COLLIDER_SCRIPT = 'rope.builtins.colliders._collider'
 local Trigger = rope.Component:subclass('CollisionTrigger')
 
 function Trigger:update()
-    for _, o1 in ipairs(self.gameScene.gameObjects) do
+    for i, o1 in ipairs(self.gameScene.gameObjects) do
         local col1 = o1:getComponent(COLLIDER_SCRIPT)
         if col1 then
-            for _, o2 in ipairs(self.gameScene.gameObjects) do
+            local o2s = {unpack(self.gameScene.gameObjects, i + 1)}
+            -- ^ take __distinct__ pairs of (col1, col2)
+            for _, o2 in ipairs(o2s) do
                 local col2 = o2:getComponent(COLLIDER_SCRIPT)
                 if col2 and o1 ~= o2 then
                     if col1:collidesWith(col2) then

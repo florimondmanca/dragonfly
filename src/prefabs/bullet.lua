@@ -29,13 +29,5 @@ return {
                 }
             }
         },
-        {
-            script = 'rope.builtins.graphics.rectangle_renderer',
-            arguments = {
-                dimsFrom = 'rope.builtins.graphics.image_renderer',
-                mode = 'line',
-                isDebug = true
-            }
-        },
     }
 }

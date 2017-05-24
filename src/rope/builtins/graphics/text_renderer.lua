@@ -26,7 +26,7 @@ function Component:getDimensions() return self.textObject:getDimensions() end
 function Component:draw()
     love.graphics.setColor(self.color)
     local pos = self.gameObject.globalTransform.position
-    love.graphics.print(self.text, pos.x, pos.y)
+    love.graphics.draw(self.textObject, pos.x, pos.y)
 end
 
 return Component
