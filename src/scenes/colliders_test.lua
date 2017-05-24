@@ -14,29 +14,29 @@ return {
                 },
             },
         },
-        {
-            name = 'Edge',
-            transform = {position = {x = 400, y = 300}},
-            components = {
-                {
-                    script = 'rope.builtins.colliders.edge_collider',
-                    arguments = {point1 = {x=0, y=-100}, point2={x=0, y=100}},
-                },
-            }
-        },
         -- {
-        --     name = 'Rectangle',
+        --     name = 'Edge',
         --     transform = {position = {x = 400, y = 300}},
         --     components = {
         --         {
-        --             script = 'rope.builtins.colliders.rectangle_collider',
-        --             arguments = {
-        --                 width = 300,
-        --                 height = 200
-        --             },
+        --             script = 'rope.builtins.colliders.edge_collider',
+        --             arguments = {point1 = {x=0, y=-100}, point2={x=0, y=100}},
         --         },
         --     }
         -- },
+        {
+            name = 'Rectangle',
+            transform = {position = {x = 400, y = 300}},
+            components = {
+                {
+                    script = 'rope.builtins.colliders.rectangle_collider',
+                    arguments = {
+                        width = 300,
+                        height = 200
+                    },
+                },
+            }
+        },
         {
             name = 'Circle',
             components = {

@@ -397,7 +397,7 @@ end
 ----- tests if a rectangle intersects with a circle
 local function intersectingRectangleAndCircle(rect, cir, transform1, transform2)
     for _, edge in pairs(rect:edges()) do
-        if intersectingCircleAndEdge(cir, edge, transform1, transform2) then
+        if intersectingCircleAndEdge(cir, edge, transform2, transform1) then
             return true
         end
     end
