@@ -29,10 +29,10 @@ return {
                 filename = 'static/img/bullet-left.png',
             }
         },
-        -- {
-        --     script = 'components.random_shoot_controller',
-        --     arguments = {meanWaitTime = 3, waitTimeSigma = 1}
-        -- },
+        {
+            script = 'components.random_shoot_controller',
+            arguments = {meanWaitTime = 3, waitTimeSigma = 1}
+        },
         -- collision
         {
             script = 'rope.builtins.colliders.rectangle_collider',

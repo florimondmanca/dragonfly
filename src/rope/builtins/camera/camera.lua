@@ -7,9 +7,9 @@ local Camera = rope.Component:subclass('Camera')
 function Camera:awake()
     -- set() must be called before all draws,
     -- it manages rotation and scaling
-    self.gameObject.set = function(self)
-        local r = self.globalTransform.rotation
-        local scale = self.globalTransform.size
+    self.gameObject.set = function(self, target)
+        local r = target.globalTransform.rotation
+        local scale = target.globalTransform.size
         love.graphics.push()
         love.graphics.rotate(-r)
         love.graphics.scale(1 / scale.x, 1 / scale.y)

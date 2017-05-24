@@ -256,7 +256,7 @@ local function getComponents(self, componentType, num, filter)
         if component:isInstanceOf(componentType) and filter(component) then
             found[#found + 1] = component
         end
-        if #found >= num then return found end
+        if (num and #found >= num) then return found end
     end
     return found
 end
@@ -604,11 +604,11 @@ end
 
 --- draws the game scene
 function GameScene:draw()
-    self.camera:set()
     for _, gameObject in ipairs(self.gameObjects) do
+        self.camera:set(gameObject)
         gameObject:draw(self.settings.debug)
+        self.camera:unset()
     end
-    self.camera:unset()
 end
 
 
