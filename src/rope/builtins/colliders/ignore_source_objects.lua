@@ -16,7 +16,7 @@ function Component:awake()
         collider.addCollision = function (self, other)
             local source = self.gameObject.source
             if not source or source ~= other.gameObject then
-                table.insert(self.collisions, other)
+                self:newCollision(other)
             end
         end
     end

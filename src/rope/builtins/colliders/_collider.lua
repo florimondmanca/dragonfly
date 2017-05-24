@@ -16,28 +16,31 @@ function Collider:initialize(arguments)
     self.collisions = {}
 end
 
+----- creates a new collision with a collider
+function Collider:newCollision(other)
+    self.collisions[other] = {resolved = false}
+end
+
+function Collider:resolved(collider)
+    self.collisions[collider].resolved = true
+    print('resolved collision with', collider.gameObject.name)
+end
+
 ----- registers a collision with another collider for the current time frame.
+-- you may override this in specialized components to, for example, filter
+-- the collisions based on some condition
 -- @tparam Collider other
 function Collider:addCollision(other)
-    table.insert(self.collisions, other)
+    self:newCollision(other)
 end
 
------ updates the collider.
--- calls resolve() on each collision encountered in this frame.
--- @tparam number dt delta time as passed to love.update()
-function Collider:update(dt)
-    for _, collider in ipairs(self.collisions) do
-        self:resolve(collider, dt)
+----- updates the collider by removing resolved collisions.
+function Collider:update()
+    local collisions = {}
+    for collider, collision in pairs(self.collisions) do
+        if not collision.resolved then collisions[collider] = collision end
     end
-    self.collisions = {}
-end
-
------ resolves a collision with another collider.
--- this is a callback function that should be set in resolver components
--- @tparam Collider collider
--- @tparam dt delta time as passed to love.update()
-function Collider:resolve()
-    -- callback function
+    self.collisions = collisions
 end
 
 ----- tests if collider collides with another collider, shape or point.

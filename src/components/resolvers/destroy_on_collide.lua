@@ -13,23 +13,28 @@ function Component:worksWith()
     return {collider = {script = COLLIDER_SCRIPT}}
 end
 
-function Component:awake()
-    local resolvedGroups = self.resolvedGroups
-    self.collider.resolve = function (self, collider, _)
-        -- if collider has a group, only resolve if it is registered in
-        -- the resolved groups
-        if collider.group then
-            local group = resolvedGroups[collider.group]
-            if group then
-                if group.destroySelf then self.gameObject:destroy() end
-                if group.destroyOther then collider.gameObject:destroy() end
-            end
-        -- destroy everyone by default
-        else
-            self.gameObject:destroy()
-            collider.gameObject:destroy()
+function Component:update()
+    for collider in pairs(self.collider.collisions) do
+        if self:resolve(collider) then
+            self.collider:resolved(collider)
         end
     end
+end
+
+function Component:resolve(collider)
+    -- if collider has a group, only resolve if it is registered in
+    -- the resolved groups
+    if collider.group then
+        local group = self.resolvedGroups[collider.group]
+        if not group then return false end
+        if group.destroySelf then self.gameObject:destroy() end
+        if group.destroyOther then collider.gameObject:destroy() end
+        return true
+    end
+    -- destroy everyone by default
+    self.gameObject:destroy()
+    collider.gameObject:destroy()
+    return true
 end
 
 return Component

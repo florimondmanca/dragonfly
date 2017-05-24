@@ -24,8 +24,8 @@ return {
             script = 'components.resolvers.destroy_on_collide',
             arguments = {
                 resolvedGroups = {
-                    player = {destroySelf = true},
-                    enemy = {destroySelf = true},
+                    player = {destroySelf = true, destroyOther = true},
+                    enemy = {destroySelf = true, destroyOther = true},
                 }
             }
         },
