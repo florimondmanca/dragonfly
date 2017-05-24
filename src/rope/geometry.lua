@@ -464,25 +464,16 @@ end
 local function intersectingEdges(edge1, edge2, transform1, transform2)
     local points1 = edge1:globalVertices(transform1)
     local points2 = edge2:globalVertices(transform2)
-
-    -- represent lines as P(t) = p + t*u (t in [0, 1])
-    local p1, p2 = points1[1], points2[1]
-    local u1, u2 = points1[2] - points1[1], points2[2] - points2[1]
-    local v = p2 - p1
-
-    -- solve P1(t1) = P2(t2): a bit of linear algebra here...
-
-    local det = -u1.x*u2.y + u1.y*u2.x
-    -- det == 0 means that edges are colinear, no intersection
+    local u1, u2 = points1[1], points2[1]
+    local v1, v2 = points1[2] - points1[1], points2[2] - points2[1]
+    local b = u2 - u1
+    local det = -(v1.x * v2.y - v1.y * v2.x)
+    -- if det == 0, edges are colinear and do not intersect
     if det == 0 then return false end
-
-    local t1 = (-u2.y*v.x - u2.x*v.y)/det
-    local t2 = (-u1.y*v.x + u1.x*v.y)/det
-
-    -- verify that t1 and t2 both lie in [0, 1]
-    if t1 < 0 or t1 > 1 or t2 < 0 or t2 > 1 then return false end
-
-    return true
+    --
+    local t1 = (-v2.y * b.x + v2.x * b.y)/det
+    local t2 = (-v1.y * b.x + v1.x * b.y)/det
+    return 0 <= t1 and t1 <= 1 and 0 <= t2 and t2 <= 1
 end
 
 ----- tests if two (axis-aligned) rectangles intersect
@@ -499,8 +490,8 @@ end
 ----- tests if a rectangle intersects with an edge
 local function intersectingRectangleAndEdge(rect, edge, transform1, transform2)
     -- intersection <=> the edge collides with one of the rectangle's sides
-    for _, side in ipairs(rect:sides()) do
-        if intersectingEdges(edge, side, transform1, transform2) then
+    for _, side in pairs(rect:sides()) do
+        if intersectingEdges(side, edge, transform1, transform2) then
             return true
         end
     end
