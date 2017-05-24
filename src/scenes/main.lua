@@ -53,10 +53,11 @@ return {
                 -- motion control
                 {
                     script = 'components.movement.velocity',
+                    arguments = {vx = 20},
                 },
                 {
                     script = 'components.movement.physics_motor',
-                    arguments = {axis='y', speed=200, drag=10},
+                    arguments = {axis='y', speed=200, drag=5},
                 },
                 {
                     script = 'components.movement.input_motor_controller',
@@ -92,8 +93,6 @@ return {
                         dimsFrom = 'rope.builtins.graphics.image_renderer',
                     }
                 },
-                -- camera
-                {script = 'rope.builtins.camera.link'},
             },
         },
         {

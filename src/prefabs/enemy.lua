@@ -11,7 +11,7 @@ return {
         },
         {
             script = 'components.movement.physics_motor',
-            arguments = {axis = 'y', speed = 150, drag = 5}
+            arguments = {axis = 'y', speed = 100, drag = 2}
         },
         {
             script = 'components.movement.random_chase_motor_controller',

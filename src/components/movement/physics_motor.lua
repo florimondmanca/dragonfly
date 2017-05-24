@@ -8,13 +8,16 @@ function Component:initialize(arguments)
 end
 
 function Component:update()
-    self.velocity:applyForce(-self.drag * self.velocity.vx, -self.drag * self.velocity.vy)
+    self.velocity:applyForce(
+        self.axis == 'x' and (-self.drag * self.velocity.vx) or 0,
+        self.axis == 'y' and (-self.drag * self.velocity.vy) or 0
+    )
 end
 
 function Component:move(direction)
     local d = direction > 0 and 1 or -1
-    local fx = d * (self.axis == 'x' and self.speed or 0) * self.drag
-    local fy = d * (self.axis == 'y' and self.speed or 0) * self.drag
+    local fx = d * (self.axis == 'x' and self.speed * self.drag or 0)
+    local fy = d * (self.axis == 'y' and self.speed * self.drag or 0)
     self.velocity:applyForce(fx, fy)
 end
 
