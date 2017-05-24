@@ -24,7 +24,7 @@ function Component:draw()
     love.graphics.line(
         x1 * self.gameObject.globalTransform.size.x + pos.x,
         y1 * self.gameObject.globalTransform.size.y + pos.y,
-        x2 * self.gameObject.globalTransform.size.x + pos.y,
+        x2 * self.gameObject.globalTransform.size.x + pos.x,
         y2 * self.gameObject.globalTransform.size.y + pos.y
     )
 end

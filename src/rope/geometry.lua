@@ -344,13 +344,16 @@ end
 
 ----- tests if a circle and an edge intersect
 local function intersectingCircleAndEdge(cir, edge, transform1, transform2)
-    local c = cir:globalCircle(transform1).center
+    cir = cir:globalCircle(transform1)
+    local c = cir.center
     local a, b = unpack(edge:globalVertices(transform2))
     local ab = b - a  -- direction a -> b
     -- d is the projection of c on the segment ab
-    local d = a + ((c-a):dot(ab))/ab:norm2() * ab
-    -- intersection if d is inside the circle
-    return d:norm2() <= cir.radius^2
+    local t = ((c-a):dot(ab))/ab:norm2()
+    local d = a + t * ab
+    return
+        (d-c):norm2() <= cir.radius^2
+        and (d-a):dot(ab) > 0 and (d-b):dot(ab) < 0
 end
 
 ----- tests if two edges intersect
@@ -393,14 +396,12 @@ end
 
 ----- tests if a rectangle intersects with a circle
 local function intersectingRectangleAndCircle(rect, cir, transform1, transform2)
-    rect = rect:globalRectangle(transform1)
-    cir = cir:globalCircle(transform2)
-
-    for _, vertex in ipairs(rect:vertices()) do
-        if cir:contains(vertex) then return true end
+    for _, edge in pairs(rect:edges()) do
+        if intersectingCircleAndEdge(cir, edge, transform1, transform2) then
+            return true
+        end
     end
-
-    return rect:contains(cir.center)
+    return false
 end
 
 local function any(condition, list)
