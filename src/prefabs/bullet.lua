@@ -8,7 +8,6 @@ return {
             script = 'rope.builtins.graphics.image_renderer',
             -- give filename
         },
-        {script = 'components.die_out_of_screen'},
         -- collision
         {
             script = 'rope.builtins.colliders.rectangle_collider',
@@ -26,6 +25,7 @@ return {
                 resolvedGroups = {
                     player = {destroySelf = true, destroyOther = true},
                     enemy = {destroySelf = true, destroyOther = true},
+                    screen_borders = {destroySelf = true}
                 }
             }
         },

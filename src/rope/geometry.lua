@@ -199,7 +199,7 @@ function Edge:contains(vector)
     local v = vector - self.point1
     return
         u.y*v.x == v.y*u.x -- colinear
-        and (0 <= v.x/u.x <= 1 and 0 <= v.y/u.y <= 1) -- lies on segment
+        and (0 <= v.x/u.x and v.x/u.x <= 1 and 0 <= v.y/u.y and v.y/u.y <= 1) -- lies on segment
 end
 
 
@@ -231,7 +231,7 @@ function Rectangle:vertices()
     }
 end
 
-function Rectangle:sides()
+function Rectangle:edges()
     local vertices = self:vertices()
     return {
         top = Edge(vertices.topleft, vertices.topright),
@@ -268,135 +268,10 @@ function Rectangle:contains(vector)
 		vector.y <= self.origin.y + self.height
 end
 
+------------------
+-- Line Polygon --
+------------------
 
--------------
--- Polygon --
--------------
-
------ tests collision between a polygon and something else
-local function intersectingPolygonAndOther(poly1, other, transform1, transform2)
-	transform1 = transform1 or Transform()
-
-	local poly1Verts = poly1:globalVertices(transform1)
-	local otherVerts
-	local otherType = class.isInstanceOf(other, Vector, Circle)
-	if otherType == Vector then
-		otherVerts = {other}
-	elseif otherType == Circle then
-		local gc = other:globalCircle(transform2)
-		--we will rotate the "vertices" (center and two outmost points) on each new axis
-		otherVerts = {
-			gc.center - Vector(gc.radius, 0),
-			gc.center,
-			gc.center + Vector(gc.radius, 0)
-		}
-	else
-		otherVerts = other:globalVertices(transform2)
-	end
-
-	--check against every axis of both colliders
-	--if collider is polygon, axis is normal of a side
-	--if collider is circle, axis is the line between the closest polygon vertex and the circle center
-	for icollider, collider in ipairs({poly1Verts, otherVerts}) do
-		local len = #collider
-
-		--if the 2nd collider has only one vertex, we've already checked it
-		if len < 2 and icollider == 2 then
-			return true
-		end
-
-		local normal = nil
-		local minSm = nil
-		local closest = nil
-
-		--if this collider is a circle, we generate the "normal" here
-		if icollider == 2 and otherType == Circle then
-			for _, vertex in ipairs(poly1Verts) do
-				local sm = (vertex - other:globalCenter(transform2)):sqrMagnitude()
-				if not minSm or sm <= minSm then
-					minSm = sm
-					closest = vertex
-				end
-			end
-			normal = other:globalCenter(transform2) - closest
-		end
-
-		--if this is a polygon, we will check each side
-		--if this is not a polygon, we will break at the end of the loop
-		for i, vertex in ipairs(collider) do
-			if icollider == 1 or otherType ~= Circle then
-				normal = Vector.rotate(collider[i%len + 1] - vertex, 90)
-			end
-
-			--the vector might be (0,0) if the 2nd collider is a circle,
-			--and the 1st collider is touching its center
-			if normal.x == 0 and normal.y == 0 then
-				return true
-			end
-
-			local normalAngle = normal:angle()
-
-			local minPoint1 = nil
-			local maxPoint1 = nil
-
-			--project the first collider's vertices against the normal
-			for _, vertex2 in ipairs(poly1Verts) do
-				local projected = vertex2:project(normal)
-				local adjustedProjected = projected:rotate(normalAngle)
-
-				if not minPoint1 then
-					minPoint1 = adjustedProjected
-				end
-
-				if not maxPoint1 then
-					maxPoint1 = adjustedProjected
-				elseif adjustedProjected.x < minPoint1.x then
-					minPoint1 = adjustedProjected
-				elseif adjustedProjected.x > maxPoint1.x then
-					maxPoint1 = adjustedProjected
-				end
-			end
-
-			local minPoint2 = nil
-			local maxPoint2 = nil
-
-			--project the second collider's vertices against the normal
-			for _, vertex2 in ipairs(otherVerts) do
-				local projected = vertex2:project(normal)
-				local adjustedProjected = projected:rotate(normalAngle)
-
-				if not minPoint2 then
-					minPoint2 = adjustedProjected
-				end
-
-				if not maxPoint2 then
-					maxPoint2 = adjustedProjected
-				elseif adjustedProjected.x < minPoint2.x then
-					minPoint2 = adjustedProjected
-				elseif adjustedProjected.x > maxPoint2.x then
-					maxPoint2 = adjustedProjected
-				end
-			end
-
-			local points = {{minPoint1,1}, {minPoint2,2}, {maxPoint1,1}, {maxPoint2,2}}
-			table.sort(points, function(a,b) return a[1].x < b[1].x end)
-
-			--if the first two sorted points are from the same collider, we've found a gap
-			--(unless the min of one is exactly the max of the other)
-			if points[1][2] == points[2][2] and points[2][1].x ~= points[3][1].x then
-				return false
-			end
-
-			--if this is a circle, there is only one "normal" to check, so we can break now
-			if icollider == 2 and otherType == Circle then
-				break
-			end
-		end
-	end
-
-	--if no gaps have been found, there must be a collision
-	return true
-end
 
 local Polygon = Shape:subclass('Polygon')
 
@@ -431,12 +306,30 @@ function Polygon:globalVertices(transform)
 	return globalVertices
 end
 
-function Polygon:globalPolygon(transform)
-	return Polygon(self:globalVertices(transform))
+function Polygon:edges()
+    local edges = {}
+    for i = 1, #self.vertices - 1 do
+        table.insert(edges, Edge(self.vertices[i], self.vertices[i+1]))
+    end
+    table.insert(edges, Edge(self.vertices[#self.vertices], self.vertices[1]))
+    return edges
 end
 
-function Polygon:contains(vector)
-	return intersectingPolygonAndOther(self, vector)
+function Polygon:coords()
+    local coords = {}
+    for _, vertex in ipairs(self.vertices) do
+        table.insert(coords, vertex.x)
+        table.insert(coords, vertex.y)
+    end
+    return coords
+end
+
+function Polygon:globalCoords(transform)
+    return (self:globalPolygon(transform)):coords()
+end
+
+function Polygon:globalPolygon(transform)
+	return self.class(self:globalVertices(transform))
 end
 
 
@@ -490,7 +383,7 @@ end
 ----- tests if a rectangle intersects with an edge
 local function intersectingRectangleAndEdge(rect, edge, transform1, transform2)
     -- intersection <=> the edge collides with one of the rectangle's sides
-    for _, side in pairs(rect:sides()) do
+    for _, side in pairs(rect:edges()) do
         if intersectingEdges(side, edge, transform1, transform2) then
             return true
         end
@@ -510,6 +403,43 @@ local function intersectingRectangleAndCircle(rect, cir, transform1, transform2)
     return rect:contains(cir.center)
 end
 
+local function any(condition, list)
+    for _, element in ipairs(list) do
+        if condition(element) then return true end
+    end
+    return false
+end
+
+local function intersectingPolygonAndVector(poly, vector, transform1, transform2)
+    poly = poly:globalPolygon(transform1)
+    vector = vector + transform2.position
+    return any(function(edge) return edge:contains(vector) end, poly:edges())
+end
+
+
+local function intersectingPolygonAndOther(poly, other, transform1, transform2)
+    local otherType = class.isInstanceOf(other, Vector, Rectangle, Circle, Edge)
+    if otherType == Vector then
+        return intersectingPolygonAndVector(poly, other, transform1, transform2)
+
+    elseif otherType == Edge then
+        return any(function(edge)
+            return intersectingEdges(edge, other, transform1, transform2)
+        end, poly:edges())
+
+    elseif otherType == Rectangle then
+        return any(function(edge)
+            return intersectingRectangleAndEdge(other, edge, transform2, transform1)
+        end, poly:edges())
+
+    elseif otherType == Circle then
+        other = other:globalCircle(transform2)
+        return any(function(edge)
+            return intersectingCircleAndEdge(other, edge, transform1, transform2)
+        end, poly:edges())
+    end
+end
+
 --- tests if two shapes interesect.
 -- supports points, axis-aligned rectangles and circles.
 -- @tparam Shape shape1
@@ -524,8 +454,14 @@ local function intersecting(shape1, shape2, transform1, transform2)
     )
     transform1 = Transform(transform1)
     transform2 = Transform(transform2)
-    local shape1Type = class.isInstanceOf(shape1, Vector, Rectangle, Circle, Edge)
-    local shape2Type = class.isInstanceOf(shape2, Vector, Rectangle, Circle, Edge)
+    local shape1Type = class.isInstanceOf(shape1, Vector, Rectangle, Circle, Edge, Polygon)
+    local shape2Type = class.isInstanceOf(shape2, Vector, Rectangle, Circle, Edge, Polygon)
+
+    if shape1Type == Polygon then
+        return intersectingPolygonAndOther(shape1, shape2, transform1, transform2)
+    elseif shape2Type == Polygon then
+        return intersectingPolygonAndOther(shape2, shape1, transform2, transform1)
+    end
 
     -- intersection between a point and...
     if shape1Type == Vector then
@@ -596,5 +532,6 @@ return {
     Edge = Edge,
     Circle = Circle,
     Rectangle = Rectangle,
+    Polygon = Polygon,
     intersecting = intersecting,
 }

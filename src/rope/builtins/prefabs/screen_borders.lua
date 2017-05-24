@@ -1,13 +1,12 @@
--- local w, h = love.graphics.getDimensions()
+local w, h = love.graphics.getDimensions()
 
 return {
     components = {
-        -- borders
         {
-            script = 'rope.builtins.colliders.edge_collider',
+            script = 'rope.builtins.colliders.polygon_line_collider',
             arguments = {
-                point1 = {x=500, y=0},
-                point2 = {x=400, y=600}
+                group = 'screen_borders',
+                points = {{x=0, y=0}, {x=w, y=0}, {x=w, y=h}, {x=0, y=h}}
             }
         },
         -- link to camera
