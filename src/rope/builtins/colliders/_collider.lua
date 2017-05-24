@@ -33,6 +33,7 @@ end
 -- filter the collisions based on some condition.
 -- @tparam Collider collider
 function Collider:addCollision(collider)
+    -- print('detected collision between', self.gameObject.name, 'and', collider.gameObject.name)
     if self:acceptsCollisionWith(collider)
     and collider:acceptsCollisionWith(self) then
         self:newCollision(collider)
@@ -45,7 +46,6 @@ end
 -- returns true by default.
 -- @tparam Collider otherCollider
 function Collider:acceptsCollisionWith()
-    -- callback
     return true
 end
 
