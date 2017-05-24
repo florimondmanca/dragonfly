@@ -41,8 +41,8 @@ function Component:awake()
             color = {255, 255, 0},
             mode = 'line',
             dimsFrom = 'rope.builtins.colliders.rectangle_collider',
-            isDebug = true
-        }
+        },
+        isDebug = true
     })
 end
 
