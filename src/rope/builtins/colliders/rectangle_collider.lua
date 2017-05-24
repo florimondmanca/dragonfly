@@ -24,6 +24,7 @@ function Component:initialize(arguments)
     end
     arguments.width, arguments.height = nil, nil
     rope.Component.initialize(self, arguments)
+    self.collisions = {}
 end
 
 function Component:awake()

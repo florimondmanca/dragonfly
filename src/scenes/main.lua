@@ -18,21 +18,16 @@ return {
             components = {
                 {
                     script = 'rope.builtins.event.event_manager',
-                    arguments = {
-                        events = {
-                            'player-shoot',
-                            'enemy-shoot',
-                            'collision'
-                        }
-                    }
+                    arguments = {events = {
+                        'player_shoot',
+                    }}
                 },
                 {
                     script = 'rope.builtins.event.key_trigger',
-                    arguments = {event = 'player-shoot', key = 'space'}
+                    arguments = {event = 'player_shoot', key = 'space'}
                 },
                 {
                     script = 'rope.builtins.event.collision_trigger',
-                    arguments = {event = 'collision'}
                 },
             },
         },
@@ -78,32 +73,12 @@ return {
                     }
                 },
                 -- collision
-                -- collider
                 {
                     script = 'rope.builtins.colliders.rectangle_collider',
                     arguments = {
                         dimsFrom = 'rope.builtins.graphics.image_renderer',
                     }
                 },
-                -- define on collide behavior
-                {
-                    script = 'components.collision.destroy_on_collide',
-                    arguments = {
-                        onCollideWithGroup = {
-                            bullet = {destroySelf = true, destroyOther = true}
-                        }
-                    }
-                },
-                -- resolve collision on event collision
-                {
-                    script = 'rope.builtins.event.event_listener',
-                    arguments = {
-                        event = 'collision',
-                        targetComponent = 'components.collision.destroy_on_collide',
-                        targetFunction = 'resolve'
-                    }
-                },
-                -- add AABB debug rectangle
                 {
                     script = 'rope.builtins.graphics.rectangle_renderer',
                     arguments = {
@@ -112,11 +87,11 @@ return {
                         isDebug = true
                     }
                 },
-                -- shoot on event player-shoot
+                -- shoot on event player_shoot
                 {
                     script = 'rope.builtins.event.event_listener',
                     arguments = {
-                        event = 'player-shoot',
+                        event = 'player_shoot',
                         targetComponent = 'components.shooter',
                         targetFunction = 'shoot'
                     }
@@ -124,17 +99,6 @@ return {
                 -- camera
                 {script = 'rope.builtins.camera.link'},
                 -- {script = 'rope.builtins.camera.target'}
-            },
-            children = {
-                {
-                    name = 'health',
-                    components = {
-                        {
-                            script = 'rope.builtins.graphics.text_renderer',
-                            arguments = {text='15 HP'}
-                        }
-                    }
-                },
             },
         },
         {

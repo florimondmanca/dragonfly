@@ -37,16 +37,8 @@ return {
         {
             script = 'rope.builtins.colliders.rectangle_collider',
             arguments = {
-                collideGroup = 'enemy',
+                group = 'enemy',
                 dimsFrom = 'rope.builtins.graphics.image_renderer'
-            }
-        },
-        {
-            script = 'components.collision.destroy_on_collide',
-            arguments = {
-                onCollideWithGroup = {
-                    bullet = {destroySelf = true, destroyOther = true}
-                }
             }
         },
         {
@@ -55,15 +47,6 @@ return {
                 dimsFrom = 'rope.builtins.graphics.image_renderer',
                 mode = 'line',
                 isDebug = true
-            }
-        },
-        -- catch collision events
-        {
-            script = 'rope.builtins.event.event_listener',
-            arguments = {
-                event = 'collision',
-                targetComponent = 'components.collision.destroy_on_collide',
-                targetFunction = 'resolve'
             }
         },
     }

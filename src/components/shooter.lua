@@ -36,7 +36,8 @@ function Component:shoot()
             },
         }
     }
-    rope.buildObject(self.gameScene, bullet).source = self.gameObject
+    local object = rope.buildObject(self.gameScene, bullet)
+    object.source = self.gameObject
 end
 
 return Component
