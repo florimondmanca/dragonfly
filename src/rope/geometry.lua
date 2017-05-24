@@ -151,6 +151,58 @@ function Circle:contains(vector)
 end
 
 
+----------
+-- Edge --
+----------
+
+local Edge = Shape:subclass('Edge')
+
+----- initializes an Edge
+-- an Edge Shape is a line segment. they can be used to create the boundaries
+-- of the terrain.
+-- @tparam Vector a one vertex of the edge
+-- @tparam Vector b the other vertex of the edge
+function Edge:initialize(point1, point2)
+    asserts.isInstanceOfOrNil(Vector, point1, 'point1')
+    asserts.isInstanceOfOrNil(Vector, point2, 'point2')
+    assert(point1.x ~= point2.x or point1.y ~= point2.y,
+    'Edge must have distinct vertices, where:' .. tostring(point1) .. ' and ' .. tostring(point2))
+    self.point1 = point1
+    self.point2 = point2
+end
+
+function Edge:coords()
+    return self.point1.x, self.point1.y, self.point2.x, self.point2.y
+end
+
+function Edge:vertices()
+    return {self.point1, self.point2}
+end
+
+function Edge:globalVertices(transform, ignoreRotation)
+	local globalVertices = {}
+	for i, vertex in ipairs(self:vertices()) do
+		globalVertices[i] = Vector(vertex.x * transform.size.x, vertex.y * transform.size.y)
+		if not ignoreRotation then
+			globalVertices[i] = globalVertices[i]:rotate(transform.rotation) + transform.position
+		end
+	end
+	return globalVertices
+end
+
+function Edge:globalEdge(transform)
+    return Edge(unpack(self:globalVertices(transform)))
+end
+
+function Edge:contains(vector)
+    local u = self.point2 - self.point1
+    local v = vector - self.point1
+    return
+        u.y*v.x == v.y*u.x -- colinear
+        and (0 <= v.x/u.x <= 1 and 0 <= v.y/u.y <= 1) -- lies on segment
+end
+
+
 ---------------
 -- Rectangle --
 ---------------
@@ -176,6 +228,16 @@ function Rectangle:vertices()
         topright = self.origin + Vector(self.width, 0),
         bottomleft = self.origin + Vector(0, self.height),
         bottomright = self.origin + Vector(self.width, self.height),
+    }
+end
+
+function Rectangle:sides()
+    local vertices = self:vertices()
+    return {
+        top = Edge(vertices.topleft, vertices.topright),
+        right = Edge(vertices.topright, vertices.bottomright),
+        bottom = Edge(vertices.bottomright, vertices.bottomleft),
+        left = Edge(vertices.bottomleft, vertices.topleft)
     }
 end
 
@@ -387,7 +449,43 @@ local function intersectingCircles(cir1, cir2, transform1, transform2)
     return (cir1:globalCenter(transform1) - cir2:globalCenter(transform2)):norm2() <= (cir1.radius + cir2.radius)^2
 end
 
------ tests if two rectangles intersect
+----- tests if a circle and an edge intersect
+local function intersectingCircleAndEdge(cir, edge, transform1, transform2)
+    local c = cir:globalCircle(transform1).center
+    local a, b = unpack(edge:globalVertices(transform2))
+    local ab = b - a  -- direction a -> b
+    -- d is the projection of c on the segment ab
+    local d = a + ((c-a):dot(ab))/ab:norm2() * ab
+    -- intersection if d is inside the circle
+    return d:norm2() <= cir.radius^2
+end
+
+----- tests if two edges intersect
+local function intersectingEdges(edge1, edge2, transform1, transform2)
+    local points1 = edge1:globalVertices(transform1)
+    local points2 = edge2:globalVertices(transform2)
+
+    -- represent lines as P(t) = p + t*u (t in [0, 1])
+    local p1, p2 = points1[1], points2[1]
+    local u1, u2 = points1[2] - points1[1], points2[2] - points2[1]
+    local v = p2 - p1
+
+    -- solve P1(t1) = P2(t2): a bit of linear algebra here...
+
+    local det = -u1.x*u2.y + u1.y*u2.x
+    -- det == 0 means that edges are colinear, no intersection
+    if det == 0 then return false end
+
+    local t1 = (-u2.y*v.x - u2.x*v.y)/det
+    local t2 = (-u1.y*v.x + u1.x*v.y)/det
+
+    -- verify that t1 and t2 both lie in [0, 1]
+    if t1 < 0 or t1 > 1 or t2 < 0 or t2 > 1 then return false end
+
+    return true
+end
+
+----- tests if two (axis-aligned) rectangles intersect
 local function intersectingRectangles(rect1, rect2, transform1, transform2)
     rect1 = rect1:globalRectangle(transform1)
     rect2 = rect2:globalRectangle(transform2)
@@ -396,6 +494,17 @@ local function intersectingRectangles(rect1, rect2, transform1, transform2)
         and rect1.origin.x <= rect2.origin.x + rect2.width
         and rect2.origin.y - rect1.height <= rect1.origin.y
         and rect1.origin.y <= rect2.origin.y + rect2.height
+end
+
+----- tests if a rectangle intersects with an edge
+local function intersectingRectangleAndEdge(rect, edge, transform1, transform2)
+    -- intersection <=> the edge collides with one of the rectangle's sides
+    for _, side in ipairs(rect:sides()) do
+        if intersectingEdges(edge, side, transform1, transform2) then
+            return true
+        end
+    end
+    return false
 end
 
 ----- tests if a rectangle intersects with a circle
@@ -424,8 +533,8 @@ local function intersecting(shape1, shape2, transform1, transform2)
     )
     transform1 = Transform(transform1)
     transform2 = Transform(transform2)
-    local shape1Type = class.isInstanceOf(shape1, Vector, Rectangle, Circle)
-    local shape2Type = class.isInstanceOf(shape2, Vector, Rectangle, Circle)
+    local shape1Type = class.isInstanceOf(shape1, Vector, Rectangle, Circle, Edge)
+    local shape2Type = class.isInstanceOf(shape2, Vector, Rectangle, Circle, Edge)
 
     -- intersection between a point and...
     if shape1Type == Vector then
@@ -434,12 +543,25 @@ local function intersecting(shape1, shape2, transform1, transform2)
             shape1 = shape1 + transform1.position
             shape2 = shape2 + transform2.position
             return shape1.x == shape2.x and shape1.y == shape2.y
-        -- ... a circle
-        elseif shape2Type == Circle then
+        -- ... a circle, a rectangle or an edge
+        else
             return shape2:contains(shape1)
+        end
+
+    -- intersection between an edge and...
+    elseif shape1Type == Edge then
+        -- ... a point
+        if shape2Type == Vector then
+            return shape1:contains(shape2)
+        -- ... an edge
+        elseif shape2Type == Edge then
+            return intersectingEdges(shape1, shape2, transform1, transform2)
         -- ... a rectangle
         elseif shape2Type == Rectangle then
-            return shape2:contains(shape1)
+            return intersectingRectangleAndEdge(shape2, shape1, transform2, transform1)
+        -- ... a circle
+        elseif shape2Type == Circle then
+            return intersectingCircleAndEdge(shape2, shape1, transform2, transform1)
         end
 
     -- intersection between a rectangle and...
@@ -447,9 +569,13 @@ local function intersecting(shape1, shape2, transform1, transform2)
         -- ... a point
         if shape2Type == Vector then
             return shape1:contains(shape2)
-        --- ... a circle
+        -- an edge
+        elseif shape2Type == Edge then
+            return intersectingRectangleAndEdge(shape1, shape2, transform1, transform2)
+        -- ... a circle
         elseif shape2Type == Circle then
             return intersectingRectangleAndCircle(shape1, shape2, transform1, transform2)
+        -- ... a rectangle
         elseif shape2Type == Rectangle then
             return intersectingRectangles(shape1, shape2, transform1, transform2)
         end
@@ -459,6 +585,9 @@ local function intersecting(shape1, shape2, transform1, transform2)
         -- ... a point
         if shape2Type == Vector then
             return shape1:contains(shape2)
+        -- ... an edge
+        elseif shape2Type == Edge then
+            return intersectingCircleAndEdge(shape1, shape2, transform1, transform2)
         -- ... a circle
         elseif shape2Type == Circle then
             return intersectingCircles(shape1, shape2, transform1, transform2)
@@ -473,6 +602,7 @@ end
 return {
     Vector = Vector,
     Transform = Transform,
+    Edge = Edge,
     Circle = Circle,
     Rectangle = Rectangle,
     intersecting = intersecting,

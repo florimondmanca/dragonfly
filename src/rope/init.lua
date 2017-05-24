@@ -155,11 +155,17 @@ function GameEntity:addChild(child, trackParent)
     assert(child.isInstanceOf and child:isInstanceOf(GameEntity),
         'child must be a GameEntity, it is: ' .. child.name)
     assert(child ~= self, 'circular reference: cannot add self as child')
-
     if trackParent == nil then trackParent = true end
     self.children[#self.children + 1] = child
 
     if trackParent then child.parent = self end
+end
+
+--- checks if an entity is a child of another entity
+-- @tparam GameEntity entity
+-- @return index of the entity in self.children or nil
+function GameEntity:hasChild(entity)
+    return collections.index(self.children, entity)
 end
 
 --- removes a child from an entity (has no effect is child is not one of the entity's children).
@@ -540,12 +546,6 @@ function GameScene:load(src)
     self.settings = createSettingsTable(src.settings, self.settings)
     self:applySettings()
 
-    -- load game objects
-    for _, object in ipairs(src.gameObjects) do
-        if self.settings.debug or not object.isDebug then
-            buildObject(self, object)
-        end
-    end
     -- load camera
     src.camera = src.camera or {
         name = 'Camera',
@@ -555,6 +555,13 @@ function GameScene:load(src)
         }
     }
     self.camera = buildObject(self, src.camera, false)
+
+    -- load game objects
+    for _, object in ipairs(src.gameObjects) do
+        if self.settings.debug or not object.isDebug then
+            buildObject(self, object)
+        end
+    end
 end
 
 --- adds a game object to the scene. The scene will then be accessible through the game object's `gameScene` attribute.

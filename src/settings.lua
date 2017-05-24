@@ -8,5 +8,5 @@ return {
     graphics = {
         defaultFont = 'static/font/pixelfont.ttf',
     },
-    -- debug = true,  -- toggle to true to show debug lines etc
+    debug = true,  -- toggle to true to show debug lines etc
 }

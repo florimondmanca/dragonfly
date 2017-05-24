@@ -1,5 +1,4 @@
 return {
-    name = 'FPS',
     components = {
         {
             script = 'rope.builtins.graphics.text_renderer',

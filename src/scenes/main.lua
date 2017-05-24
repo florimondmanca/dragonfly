@@ -31,6 +31,10 @@ return {
                 },
             },
         },
+        {
+            name = 'Screen borders',
+            prefab = 'rope.builtins.prefabs.screen_borders'
+        },
         -- sprites
         {
             name = 'DragonFly',
@@ -90,7 +94,6 @@ return {
                 },
                 -- camera
                 {script = 'rope.builtins.camera.link'},
-                -- {script = 'rope.builtins.camera.target'}
             },
         },
         {

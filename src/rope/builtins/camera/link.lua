@@ -4,10 +4,8 @@ local rope = require 'rope'
 -- children.
 local Component = rope.Component:subclass('CameraLink')
 
-function Component:update(_, firstUpdate)
-    if firstUpdate then
-        self.gameScene.camera:addChild(self.gameObject)
-    end
+function Component:awake()
+    self.gameScene.camera:addChild(self.gameObject)
 end
 
 return Component
