@@ -269,7 +269,7 @@ function Rectangle:contains(vector)
 end
 
 ------------------
--- Line Polygon --
+-- Polygon --
 ------------------
 
 
@@ -404,42 +404,6 @@ local function intersectingRectangleAndCircle(rect, cir, transform1, transform2)
     return false
 end
 
-local function any(condition, list)
-    for _, element in ipairs(list) do
-        if condition(element) then return true end
-    end
-    return false
-end
-
-local function intersectingPolygonAndVector(poly, vector, transform1, transform2)
-    poly = poly:globalPolygon(transform1)
-    vector = vector + transform2.position
-    return any(function(edge) return edge:contains(vector) end, poly:edges())
-end
-
-
-local function intersectingPolygonAndOther(poly, other, transform1, transform2)
-    local otherType = class.isInstanceOf(other, Vector, Rectangle, Circle, Edge)
-    if otherType == Vector then
-        return intersectingPolygonAndVector(poly, other, transform1, transform2)
-
-    elseif otherType == Edge then
-        return any(function(edge)
-            return intersectingEdges(edge, other, transform1, transform2)
-        end, poly:edges())
-
-    elseif otherType == Rectangle then
-        return any(function(edge)
-            return intersectingRectangleAndEdge(other, edge, transform2, transform1)
-        end, poly:edges())
-
-    elseif otherType == Circle then
-        other = other:globalCircle(transform2)
-        return any(function(edge)
-            return intersectingCircleAndEdge(other, edge, transform1, transform2)
-        end, poly:edges())
-    end
-end
 
 --- tests if two shapes interesect.
 -- supports points, axis-aligned rectangles and circles.
@@ -455,14 +419,8 @@ local function intersecting(shape1, shape2, transform1, transform2)
     )
     transform1 = Transform(transform1)
     transform2 = Transform(transform2)
-    local shape1Type = class.isInstanceOf(shape1, Vector, Rectangle, Circle, Edge, Polygon)
-    local shape2Type = class.isInstanceOf(shape2, Vector, Rectangle, Circle, Edge, Polygon)
-
-    if shape1Type == Polygon then
-        return intersectingPolygonAndOther(shape1, shape2, transform1, transform2)
-    elseif shape2Type == Polygon then
-        return intersectingPolygonAndOther(shape2, shape1, transform2, transform1)
-    end
+    local shape1Type = class.isInstanceOf(shape1, Vector, Rectangle, Circle, Edge)
+    local shape2Type = class.isInstanceOf(shape2, Vector, Rectangle, Circle, Edge)
 
     -- intersection between a point and...
     if shape1Type == Vector then

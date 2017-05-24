@@ -22,17 +22,19 @@ return {
                     script = 'rope.builtins.colliders.edge_collider',
                     arguments = {point1 = {x=0, y=-100}, point2={x=0, y=100}},
                 },
+                {script = 'rope.builtins.mouse.link'}
             }
         },
         {
-            name = 'Edge',
+            name = 'Polygon',
             transform = {position = {x = 400, y = 300}},
             components = {
                 {
-                    script = 'rope.builtins.colliders.edge_collider',
-                    arguments = {point1 = {x=200, y=-100}, point2={x=0, y=100}},
+                    script = 'rope.builtins.colliders.polygon_collider',
+                    arguments = {
+                        points = {200, 200, 400, 300, 250, 450}
+                    }
                 },
-                {script = 'rope.builtins.mouse.link'}
             }
         },
         -- {
