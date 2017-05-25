@@ -1,25 +1,6 @@
-local rope = require 'rope'
+local Collider = require 'rope.builtins.colliders._resolver'
 
-local COLLIDER_SCRIPT = 'rope.builtins.colliders._collider'
-
-local Component = rope.Component:subclass('DestroyOnCollide')
-
-function Component:initialize(arguments)
-    arguments.resolvedGroups = arguments.resolvedGroups or {}
-    rope.Component.initialize(self, arguments)
-end
-
-function Component:worksWith()
-    return {collider = {script = COLLIDER_SCRIPT}}
-end
-
-function Component:update()
-    for collider in pairs(self.collider.collisions) do
-        if self:resolve(collider) then
-            self.collider:resolved(collider)
-        end
-    end
-end
+local Component = Collider:subclass('DestroyOnCollide')
 
 function Component:resolve(collider)
     -- if collider has a group, only resolve if it is registered in
