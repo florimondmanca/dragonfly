@@ -7,27 +7,23 @@ return {
     },
     gameObjects = {
         {
-            name = 'Rectangle',
-            transform = {position = {x = 400, y = 300}},
-            components = {
-                {
-                    script = 'rope.builtins.graphics.rectangle_renderer',
-                    arguments = {width = 200, height = 100},
-                }
-            }
+            name = 'FPS',
+            transform = {position = {x = 30, y = 30}},
+            prefab = 'rope.builtins.prefabs.fps_renderer',
+            isDebug = true,
         },
         {
-            name = 'Circle',
-            transform = {position = {x = 400, y = 300}},
+            name = 'Sprite',
             components = {
                 {
-                    script = 'rope.builtins.graphics.circle_renderer',
-                    arguments = {radius = 100}
+                    script = 'rope.builtins.graphics.sprite_animation',
+                    arguments = {
+                        sheetName = 'static/sheets/bird',
+                        fps = 30,
+                    },
                 },
-                {
-                    script = 'rope.builtins.mouse.link'
-                }
+                {script = 'rope.builtins.mouse.link'}
             }
-        }
+        },
     }
 }

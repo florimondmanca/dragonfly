@@ -1,5 +1,5 @@
 return {
-    firstScene = 'scenes/main.lua',
+    firstScene = 'scenes/test.lua',
     window = {
         title = 'LOVE!',
         width = 800,
@@ -8,5 +8,5 @@ return {
     graphics = {
         defaultFont = 'static/font/pixelfont.ttf',
     },
-    -- debug = true,  -- toggle to true to show debug lines etc
+    debug = true,  -- toggle to true to show debug lines etc
 }
