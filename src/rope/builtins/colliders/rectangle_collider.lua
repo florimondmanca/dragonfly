@@ -20,19 +20,28 @@ function Component:initialize(arguments)
         self:require(arguments, 'width', 'height')
         arguments.shape = geometry.Rectangle(arguments.width, arguments.height, arguments.origin)
     else
-        arguments.shape = geometry.Rectangle(1, 1)
+        arguments.shape = geometry.Rectangle(1, 1, arguments.origin)
     end
     arguments.width, arguments.height = nil, nil
     rope.Component.initialize(self, arguments)
     self.collisions = {}
 end
 
+function Component:worksWith()
+    if self.dimsFrom then
+        return {source = {script = self.dimsFrom}}
+    else return {}
+    end
+end
+
 function Component:awake()
     if self.dimsFrom then
-        local source = self.gameObject:getComponent(self.dimsFrom)
-        asserts.isInstanceOf(geometry.Rectangle, source.shape, 'source shape')
-        local width, height = source.shape.width, source.shape.height
-        self.shape = geometry.Rectangle(width, height, self.origin)
+        asserts.isInstanceOf(geometry.Rectangle, self.source.shape, 'source shape')
+        self.shape = geometry.Rectangle(
+            self.source.shape.width,
+            self.source.shape.height,
+            self.origin
+        )
     end
     -- add debug rectangle renderer
     self.gameObject:buildAndAddComponent({
@@ -40,7 +49,9 @@ function Component:awake()
         arguments = {
             color = {255, 255, 0},
             mode = 'line',
-            dimsFrom = 'rope.builtins.colliders.rectangle_collider',
+            width = self.shape.width,
+            height = self.shape.height,
+            origin = self.shape.origin,
         },
         isDebug = true
     })

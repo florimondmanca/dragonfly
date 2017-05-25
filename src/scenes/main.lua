@@ -47,8 +47,11 @@ return {
             components = {
                 -- image
                 {
-                    script = 'rope.builtins.graphics.image_renderer',
-                    arguments = {filename = 'static/img/dragonfly.png'}
+                    script = 'rope.builtins.graphics.sprite_animation',
+                    arguments = {
+                        sheetName = 'static/sheets/bird',
+                        fps = 30,
+                    }
                 },
                 -- motion control
                 {
@@ -72,12 +75,11 @@ return {
                     script = 'components.shooter',
                     arguments = {
                         bulletSpeed = 200,
-                        shiftX = 108,
-                        shiftY = 24,
+                        shiftX = 55,
+                        shiftY = 34,
                         filename = 'static/img/bullet-right.png',
                     }
                 },
-                -- shooting : shoot on event player_shoot
                 {
                     script = 'rope.builtins.event.event_listener',
                     arguments = {
@@ -90,7 +92,9 @@ return {
                 {
                     script = 'rope.builtins.colliders.rectangle_collider',
                     arguments = {
-                        dimsFrom = 'rope.builtins.graphics.image_renderer',
+                        width = 50,
+                        height = 30,
+                        origin = {x=5, y=25}
                     }
                 },
             },
