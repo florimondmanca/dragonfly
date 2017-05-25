@@ -484,6 +484,22 @@ local function intersecting(shape1, shape2, transform1, transform2)
     end
 end
 
+local function rectanglesOverlap(rect1, rect2, transform1, transform2)
+    rect1 = rect1:globalRectangle(transform1)
+    rect2 = rect2:globalRectangle(transform2)
+    local ox = (
+        math.min(rect1.origin.x + rect1.width, rect2.origin.x + rect2.width)
+        - math.max(rect1.origin.x, rect2.origin.x)
+    )
+    local oy = (
+        math.min(rect1.origin.y + rect1.height, rect2.origin.y + rect2.height)
+        - math.max(rect1.origin.y, rect2.origin.y)
+    )
+    if rect1.origin.x > rect2.origin.x then ox = -ox end
+    if rect1.origin.y > rect2.origin.y then oy = -oy end
+    return {x=ox, y=oy}
+end
+
 
 return {
     Vector = Vector,
@@ -493,4 +509,5 @@ return {
     Rectangle = Rectangle,
     Polygon = Polygon,
     intersecting = intersecting,
+    rectanglesOverlap = rectanglesOverlap,
 }

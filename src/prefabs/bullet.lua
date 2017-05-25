@@ -17,7 +17,7 @@ return {
             }
         },
         {
-            script = 'rope.builtins.colliders.ignore_source_objects'
+            script = 'components.colliders.ignore_source_objects'
         },
         {
             script = 'components.resolvers.destroy_on_collide',

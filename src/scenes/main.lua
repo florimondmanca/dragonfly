@@ -1,3 +1,5 @@
+local w, h = love.graphics.getDimensions()
+
 return {
     name = 'MainScene',
     settings = {
@@ -31,17 +33,13 @@ return {
                 },
             },
         },
-        {
-            name = 'Screen borders',
-            prefab = 'rope.builtins.prefabs.screen_borders'
-        },
         -- sprites
         {
             name = 'DragonFly',
             transform = {
                 position = {
                     x = 30,
-                    y = love.graphics.getHeight()/2,
+                    y = h/2,
                 },
             },
             components = {
@@ -60,7 +58,7 @@ return {
                 },
                 {
                     script = 'components.movement.physics_motor',
-                    arguments = {axis='y', speed=200, drag=5},
+                    arguments = {axis='y', speed=200, drag=10},
                 },
                 {
                     script = 'components.movement.input_motor_controller',
@@ -92,9 +90,16 @@ return {
                 {
                     script = 'rope.builtins.colliders.rectangle_collider',
                     arguments = {
-                        width = 50,
-                        height = 30,
-                        origin = {x=5, y=25}
+                        group = 'player',
+                        dimsFrom = 'rope.builtins.graphics.sprite_animation',
+                    }
+                },
+                {
+                    script = 'components.resolvers.block',
+                    arguments = {
+                        resolvedGroups = {
+                            screen_borders = {block = true},
+                        },
                     }
                 },
             },
@@ -103,7 +108,7 @@ return {
             name = 'Enemy',
             transform = {position = {
                 x = 600,
-                y = love.graphics.getHeight()/2
+                y = h/2
             }},
             prefab = 'prefabs.enemy',
         },
@@ -111,7 +116,7 @@ return {
             name = 'Enemy',
             transform = {position = {
                 x = 675,
-                y = love.graphics.getHeight()/2
+                y = h/2
             }},
             prefab = 'prefabs.enemy',
         },
@@ -119,10 +124,12 @@ return {
             name = 'Enemy',
             transform = {position = {
                 x = 750,
-                y = love.graphics.getHeight()/2
+                y = h/2
             }},
             prefab = 'prefabs.enemy'
-        }
+        },
+        -- screen borders
+        require('prefabs.screen_borders')(w, h),
     },
     camera = {
         name = 'Camera',

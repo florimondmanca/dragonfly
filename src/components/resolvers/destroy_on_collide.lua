@@ -1,6 +1,6 @@
-local Collider = require 'rope.builtins.colliders._resolver'
+local Resolver = require 'rope.builtins.colliders._resolver'
 
-local Component = Collider:subclass('DestroyOnCollide')
+local Component = Resolver:subclass('DestroyOnCollide')
 
 function Component:resolve(collider)
     -- if collider has a group, only resolve if it is registered in

@@ -20,12 +20,15 @@ end
 -- NOTE: should be called once a collision is resolved (e.g. in a resolver)
 -- @tparam Collider collider
 function Collider:resolved(collider)
-    self.collisions[collider].resolved = true
-    collider.collisions[self].resolved = true
+    self.collisions[collider] = self.collisions[collider] - 1
+    -- collider.collisions[self] = collider.collisions[self] - 1
 end
 
 function Collider:newCollision(collider)
-    self.collisions[collider] = {resolved = false}
+    if not self.collisions[collider] then
+        self.collisions[collider] = 0
+    end
+    self.collisions[collider] = self.collisions[collider] + 1
 end
 
 ----- registers a collision with another collider for the current time frame.
@@ -33,9 +36,9 @@ end
 -- filter the collisions based on some condition.
 -- @tparam Collider collider
 function Collider:addCollision(collider)
-    -- print('detected collision between', self.gameObject.name, 'and', collider.gameObject.name)
     if self:acceptsCollisionWith(collider)
     and collider:acceptsCollisionWith(self) then
+        -- print('detected collision between', self.gameObject.name, 'and', collider.gameObject.name)
         self:newCollision(collider)
         collider:newCollision(self)
     end
@@ -51,15 +54,8 @@ end
 
 ----- updates the collider by removing resolved collisions.
 function Collider:update()
-    -- local collisions = {}
-    -- for collider, collision in pairs(self.collisions) do
-    --     if not collision.resolved then
-    --         collisions[collider] = collision
-    --     end
-    -- end
-    -- self.collisions = collisions
-    for collider, collision in pairs(self.collisions) do
-        if collision.resolved then self.collisions[collider] = nil end
+    for collider, collisions in pairs(self.collisions) do
+        if collisions <= 0 then self.collisions[collider] = nil end
     end
 end
 

@@ -13,17 +13,46 @@ return {
             isDebug = true,
         },
         {
-            name = 'Sprite',
+            name = 'Event manager',
+            components = {
+                {script = 'rope.builtins.event.collision_trigger'}
+            },
+        },
+        {
+            name = 'Rectangle 1',
+            transform = {position = {x = 200, y = 200}},
             components = {
                 {
-                    script = 'rope.builtins.graphics.sprite_animation',
+                    script = 'rope.builtins.colliders.rectangle_collider',
                     arguments = {
-                        sheetName = 'static/sheets/bird',
-                        fps = 30,
-                    },
+                        width = 200,
+                        height = 300,
+                        group = 'rectangle1',
+                        static = true,
+                    }
                 },
-                {script = 'rope.builtins.mouse.link'}
+                {
+                    script = 'components.resolvers.block',
+                    arguments = {resolvedGroups = {
+                        rectangle2 = {block = true}
+                    }}
+                }
             }
         },
+        {
+            name = 'Rectangle 2',
+            components = {
+                {
+                    script = 'rope.builtins.colliders.rectangle_collider',
+                    arguments = {
+                        width = 100,
+                        height = 50,
+                        group = 'rectangle2',
+                        -- static = true
+                    }
+                },
+                {script = 'rope.builtins.mouse.link'},
+            }
+        }
     }
 }
