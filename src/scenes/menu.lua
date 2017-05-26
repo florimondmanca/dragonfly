@@ -3,7 +3,6 @@ return {
     settings = {
         graphics = {
             backgroundColor = {50, 50, 60},
-            defaultFont = 'static/font/pixelfont.ttf',
         },
     },
     gameObjects = {
@@ -30,21 +29,40 @@ return {
             components = {
                 {
                     script = 'rope.builtins.graphics.text_renderer',
-                    arguments = {text = 'DragonFly'}
+                    arguments = {
+                        text = 'DragonFly',
+                        font = 'title',
+                        fontSize = 64,
+                        alignCenter = true
+                    }
                 }
             }
         },
         -- buttons
         {
-            name = 'Button 1',
+            name = 'Play button',
             transform = {position = {x = love.graphics.getWidth()/2, y = 300}},
             prefab = 'prefabs.text_button',
             prefabComponents = {
                 {
                     script = 'rope.builtins.graphics.text_renderer',
-                    arguments = {text = 'Play'}
+                    arguments = {
+                        text = 'Play',
+                        fontSize = 16,
+                    }
                 },
             }
-        }
+        },
+        {
+            name = 'Quit button',
+            transform = {position = {x = love.graphics.getWidth()/2, y = 400}},
+            prefab = 'prefabs.text_button',
+            prefabComponents = {
+                {
+                    script = 'rope.builtins.graphics.text_renderer',
+                    arguments = {text = 'Quit'}
+                },
+            }
+        },
     },
 }

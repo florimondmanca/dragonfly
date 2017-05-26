@@ -1,5 +1,6 @@
 local class = require 'rope.class'
 local lume = require 'rope.lib.lume'
+local fontbook = require 'fontbook'
 local geometry = require 'rope.geometry'
 local asserts = require 'rope.asserts'
 
@@ -412,8 +413,16 @@ end
 -- @tparam table object a game object in its table representation.
 local function getPrefabComponents(object)
     local prefabTable = require(object.prefab)
+
+    -- deep copy the prefab components
     local components = {}
-    lume.extend(components, prefabTable.components)
+    for _, prefabComponent in ipairs(prefabTable.components) do
+        local component = {script = prefabComponent.script, arguments = {}}
+        for k, v in pairs(prefabComponent.arguments or {}) do
+            component.arguments[k] = v
+        end
+        lume.push(components, component)
+    end
 
     if not object.prefabComponents then return components end
 
@@ -488,7 +497,9 @@ function GameScene:applySettings()
     -- graphics
     love.graphics.setBackgroundColor(self.settings.graphics.backgroundColor)
     if self.settings.graphics.defaultFont then
-        love.graphics.setNewFont(self.settings.graphics.defaultFont)
+        love.graphics.setFont(
+            fontbook.get(self.settings.graphics.defaultFont)
+        )
     end
 end
 

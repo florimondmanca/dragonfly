@@ -1,10 +1,12 @@
 local rope = require 'rope'
 local geometry = require 'rope.geometry'
+local fontbook = require 'fontbook'
 
 local Component = rope.Component:subclass('TextRenderer')
 
 ----- initializes a text renderer
 -- @tparam string text an initial text to render (default is empty string)
+-- @tparam string font (optional, default is fontbook's default)
 -- @tparam number fontSize (optional, default is love's default)
 -- @tparam table color the color of the text (default is white)
 -- @tparam bool alignCenter
@@ -15,9 +17,7 @@ function Component:initialize(arguments)
 
     rope.Component.initialize(self, arguments)
     -- create font
-    self.font =
-        arguments.fontSize and love.graphics.newFont(arguments.fontSize)
-        or love.graphics.getFont()
+    self.font = fontbook.get(arguments.font, arguments.fontSize)
     -- create text object
     self.textObject = love.graphics.newText(self.font)
     self:setText()
