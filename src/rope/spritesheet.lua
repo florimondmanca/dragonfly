@@ -1,4 +1,5 @@
 local json = require 'rope.lib.json'
+local lume = require 'rope.lib.lume'
 
 
 ----- loads the spritesheet and returns its image and the associated frames.
@@ -11,14 +12,14 @@ local function load(sheetName)
     local frames = json.decode(love.filesystem.read(sheetName .. '.json'))
     local quads = {}
     local maxWidth, maxHeight = 0, 0
-    for _, frame in ipairs(frames) do
-        table.insert(quads, love.graphics.newQuad(
+    lume.each(frames, function(frame)
+        lume.push(quads, love.graphics.newQuad(
             frame.x, frame.y, frame.width, frame.height,
             image:getWidth(), image:getHeight())
         )
         if frame.width > maxWidth then maxWidth = frame.width end
         if frame.height > maxHeight then maxHeight = frame.height end
-    end
+    end)
     return image, quads, maxWidth, maxHeight
 end
 
