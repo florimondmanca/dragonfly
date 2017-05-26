@@ -1,5 +1,6 @@
 """
-Run this script above the src/ folder to zip the game into an app.love file.
+Run this script above the src/ folder to zip the game into an app.love file
+and run app.love.
 Usage: `$ python3 makelove.py`
 """
 
@@ -9,4 +10,5 @@ if __name__ == '__main__':
 
     shell = os.getenv('SHELL')
 
-    run([shell, '-i', '-c', 'cd src; zip -r ../app.love *; cd ..'])
+    run([shell, '-i', '-c',
+         'cd src; zip -r ../app.love *; cd ..; love app.love'])
