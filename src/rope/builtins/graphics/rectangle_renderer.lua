@@ -23,9 +23,8 @@ end
 
 function Component:awake()
     -- infer size from a component if necessary
-    local dimsFrom = rope.dimsFromDefaults[self.dimsFrom] or self.dimsFrom
-    if dimsFrom then
-        local component = self.gameObject:getComponent(dimsFrom)
+    if self.dimsFrom then
+        local component = self.gameObject:getComponent(self.dimsFrom)
         self.width, self.height = component.shape.width, component.shape.height
     end
     -- build the rectangle shape

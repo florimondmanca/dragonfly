@@ -1,7 +1,13 @@
 local class = require 'rope.class'
+local lume = require 'rope.lib.lume'
 local geometry = require 'rope.geometry'
-local collections = require 'rope.collections'
 local asserts = require 'rope.asserts'
+
+local function isDebug(scene, object)
+    return scene.settings.debug or object.isDebug
+end
+
+
 
 ---------------
 -- Component --
@@ -30,11 +36,17 @@ end
 -- @param ... a varargs of strings.
 -- @raise error if any of the required arguments is missing.
 function Component:require(arguments, ...)
+    local missing = {}
     arguments = arguments or {}
     for _, argName in ipairs{...} do
         if arguments[argName] == nil then
-            error(argName .. ' must be declared for component ' .. tostring(self) .. ', nil given')
+            lume.push(missing, argName)
         end
+    end
+    if #missing > 0 then
+        error('Component ' .. self.class.name
+        .. ' required the folloing missing arguments: '
+        .. table.concat(missing, ', '))
     end
 end
 
@@ -62,11 +74,8 @@ function Component:requireComponents()
         assert(script, 'missing script in worksWith declaration of ' .. self.class.name)
         local component = self.gameObject:getComponent(script, filter)
         -- if no matching component script was found, at to
-        if not component then
-            missing[#missing + 1] = script
-        else
-            self[name] = component
-        end
+        if not component then lume.push(missing, script)
+        else self[name] = component end
     end
     if #missing > 0 then
         error('Component ' .. self.class.name .. ' from ' .. self.gameObject.name ..
@@ -75,10 +84,13 @@ function Component:requireComponents()
     end
 end
 
---- callback function, called once a frame to update the component.
+--- callback function, called once per frame to update the component.
 -- @param dt delta time as passed to love.update().
 -- @tparam bool firstUpdate true on the very first frame update
 function Component:update() end
+
+--- callback function, called once per frame to draw the component
+function Component:draw() end
 
 --- loads a component *class* from a filename.
 -- @param filename the filename to the component class.
@@ -156,7 +168,7 @@ function GameEntity:addChild(child, trackParent)
         'child must be a GameEntity, it is: ' .. child.name)
     assert(child ~= self, 'circular reference: cannot add self as child')
     if trackParent == nil then trackParent = true end
-    self.children[#self.children + 1] = child
+    lume.push(self.children, child)
 
     if trackParent then child.parent = self end
 end
@@ -165,35 +177,28 @@ end
 -- @tparam GameEntity entity
 -- @return index of the entity in self.children or nil
 function GameEntity:hasChild(entity)
-    return collections.index(self.children, entity)
+    return lume.find(self.children, entity)
 end
 
 --- removes a child from an entity (has no effect is child is not one of the entity's children).
 -- @tparam GameEntity child
 function GameEntity:removeChild(child)
-	local index = collections.index(self.children, child)
-	if index then
-		table.remove(self.children, index)
-        return true
-	end
-    return false
+    return lume.remove(self.children, child)
 end
 
 function GameEntity:removeAllChildren()
-    for k, child in pairs(self.children) do
-        child:removeAllChildren()
-        child[k] = nil
-    end
+    lume.each(self.children, 'removeAllChildren')
+    lume.clear(self.children)
 end
 
 --- recursively prints a view of the entity's child tree to the console.
 function GameEntity:printChildren(level)
     level = level or 0
     if level == 0 then print('Children of ' .. self.name .. ':') end
-    for _, child in ipairs(self.children) do
+    lume.each(self.children, function(child)
         print(string.rep('\t', level) .. '> ' .. child.name)
         child:printChildren(level + 1)
-    end
+    end)
 end
 
 --- updates the entity and all its children.
@@ -201,9 +206,7 @@ end
 -- @tparam bool firstUpdate true on the first frame update
 function GameEntity:update(dt, firstUpdate)
     local status, err = pcall(function()
-        for _, child in ipairs(self.children) do
-            child:update(dt, firstUpdate)
-        end
+        lume.each(self.children, 'update', dt, firstUpdate)
     end)
     if not status then error(err .. ' (occured in ' .. self.name .. ', ' .. tostring(self) .. ')') end
 end
@@ -229,9 +232,7 @@ local ENTITIES_CALLBACKS = {
 }
 for _, f in ipairs(ENTITIES_CALLBACKS) do
     GameEntity[f] = function(self, ...)
-        for _, child in ipairs(self.children) do
-            child[f](child, ...)
-        end
+        for _, child in ipairs(self.children) do child[f](child, ...) end
     end
 end
 
@@ -254,7 +255,7 @@ local function getComponents(self, componentType, num, filter)
     local found = {}
     for _, component in ipairs(self.components) do
         if component:isInstanceOf(componentType) and filter(component) then
-            found[#found + 1] = component
+            lume.push(found, component)
         end
         if (num and #found >= num) then return found end
     end
@@ -272,7 +273,7 @@ local GameObject = GameEntity:subclass('GameObject')
 function GameObject:initialize(scene, name, transform, parent, trackObject)
     if trackObject ~= false then trackObject = true end
     self.globals = scene.globals
-    self.name = name or ''
+    self.name = name or '(?)'
     GameEntity.initialize(self, transform)
     scene:addGameObject(self, trackObject)
     -- if given, parent must be a game object, else it is the scene
@@ -292,17 +293,13 @@ end
 -- @tparam bool firstUpdate true on the first frame update
 function GameObject:update(dt, firstUpdate)
     maintainTransform(self)
-    for _, component in ipairs(self.components) do
-        component:update(dt, firstUpdate)
-    end
+    lume.each(self.components, 'update', dt, firstUpdate)
     GameEntity.update(self, dt, firstUpdate)
 end
 
 --- draws the game object by calling draw() on all its components.
 function GameObject:draw(debug)
-    for _, component in ipairs(self.components) do
-        if component.draw then component:draw(debug) end
-    end
+    lume.each(self.components, 'draw', debug)
 end
 
 --- adds a child to a game object.
@@ -325,7 +322,7 @@ end
 --- adds a component to a game object.
 -- @tparam Component component
 function GameObject:addComponent(component)
-    self.components[#self.components + 1] = component
+    lume.push(self.components, component)
     component.gameObject = self
     component.gameScene = self.gameScene
     component.globals = self.gameScene.globals
@@ -341,8 +338,11 @@ function GameObject:buildAndAddComponent(component)
         return
     end
     local componentClass = require(component.script)
-    assert(componentClass.isSubclassOf and
-    componentClass:isSubclassOf(Component), 'Script ' .. component.script .. ' does not return a Component')
+    assert(
+        componentClass.isSubclassOf
+        and componentClass:isSubclassOf(Component),
+        'Script ' .. component.script .. ' does not return a Component'
+    )
     return self:addComponent(componentClass(component.arguments or {}))
 end
 
@@ -360,18 +360,8 @@ function GameObject:getComponents(componentType, filter)
     return getComponents(self, componentType, nil, filter)
 end
 
--- function GameObject:removeComponent(componentType)
---     for i, c in ipairs(self.components) do
---         if c:isInstanceOf(componentClass) then
---             return table.remove(self.components, i)
---         end
---     end
--- end
-
 function GameObject:removeAllComponents()
-    for k, _ in pairs(self.components) do
-        self.components[k] = nil
-    end
+    lume.clear(self.components)
 end
 
 --- destroys a game object
@@ -429,21 +419,15 @@ end
 local function getPrefabComponents(object)
     local prefabTable = require(object.prefab)
     local components = {}
-    for _, component in ipairs(prefabTable.components) do
-        components[#components + 1] = component
-    end
+    lume.extend(components, prefabTable.components)
 
-    if not object.prefabComponents then
-        return components
-    end
+    if not object.prefabComponents then return components end
 
     for _, component in ipairs(components) do
         component.arguments = component.arguments or {}
         for _, overridden in ipairs(object.prefabComponents) do
             if component.script == overridden.script then
-                for k, v in pairs(overridden.arguments) do
-                    component.arguments[k] = v
-                end
+                lume.extend(component.arguments, overridden.arguments)
             end
         end
     end
@@ -463,19 +447,22 @@ local function buildObject(scene, object, trackObject)
             'Prefab must be non-empty string')
         object.components = object.components or {}
         for _, component in ipairs(getPrefabComponents(object)) do
-            object.components[#object.components + 1] = component
+            lume.push(object.components, component)
         end
     end
     -- add components
-    for _, component in ipairs(object.components) do
-        gameObject:buildAndAddComponent(component)
-    end
+    lume.each(
+        object.components,
+        function(c) gameObject:buildAndAddComponent(c) end
+    )
     -- add children
-    for _, child in ipairs(object.children or {}) do
-        if scene.settings.debug or not child.isDebug then
-            gameObject:addChild(buildObject(scene, child))
-        end
-    end
+    lume.each(
+        lume.filter(
+            object.children or {},
+            function(c) return isDebug(scene, c) end
+        ),
+        function(c) gameObject:addChild(buildObject(scene, c)) end
+    )
     return gameObject
 end
 
@@ -572,7 +559,7 @@ function GameScene:addGameObject(gameObject, trackObject)
     "Can only add GameObject to a GameScene")
     gameObject.gameScene = self
     if trackObject then
-        self.gameObjects[#self.gameObjects + 1] = gameObject
+        lume.push(self.gameObjects, gameObject)
     end
 end
 
@@ -580,10 +567,7 @@ end
 --- (its components will also be removed).
 -- @tparam GameObject gameObject
 function GameScene:removeGameObject(gameObject)
-    local index = collections.index(self.gameObjects, gameObject)
-	if index then
-		table.remove(self.gameObjects, index)
-	end
+    lume.remove(self.gameObjects, gameObject)
     gameObject:removeAllChildren()
     self:removeChild(gameObject)
 end
@@ -593,30 +577,21 @@ end
 -- @tparam bool firstUpdate true on the first frame update
 function GameScene:update(dt)
     maintainTransform(self)
-    for _, child in ipairs(self.children) do
-        self.camera:apply(child)
-        child:update(dt, not self.finishedFirstUpdate)
-    end
-    if not self.finishedFirstUpdate then
-        self.finishedFirstUpdate = true
-    end
+    lume.each(self.children, function(c)
+        self.camera:apply(c)
+        c:update(dt, not self.finishedFirstUpdate)
+    end)
+    self.finishedFirstUpdate = true
 end
 
 --- draws the game scene
 function GameScene:draw()
-    for _, gameObject in ipairs(self.gameObjects) do
-        self.camera:set(gameObject)
-        gameObject:draw(self.settings.debug)
+    lume.each(self.gameObjects, function(o)
+        self.camera:set(o)
+        o:draw(self.settings.debug)
         self.camera:unset()
-    end
+    end)
 end
-
-
-local dimsFromDefaults = {
-    image = 'rope.builtins.graphics.image_renderer',
-    text = 'rope.builtins.graphics.text_renderer',
-    rectangle = 'rope.builtins.graphics.rectangle_renderer',
-}
 
 
 return {
@@ -625,5 +600,4 @@ return {
     GameScene = GameScene,
     buildObject = buildObject,
     loadComponent = loadComponent,
-    dimsFromDefaults = dimsFromDefaults,
 }
