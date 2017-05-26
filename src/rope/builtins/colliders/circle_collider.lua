@@ -1,5 +1,4 @@
 local rope = require 'rope'
-local lume = require 'rope.lib.lume'
 local geometry = require 'rope.geometry'
 local Collider = require 'rope.builtins.colliders._collider'
 
@@ -11,7 +10,7 @@ local Component = Collider:subclass('CircleCollider')
 function Component:initialize(arguments)
     self:require(arguments, 'radius')
     arguments.shape = geometry.Circle(arguments.radius, geometry.Vector(arguments.center))
-    lume.reject(arguments, 'radius', 'center')
+    arguments.radius, arguments.center = nil, nil
     rope.Component.initialize(self, arguments)
     self.collisions = {}
 end

@@ -1,4 +1,5 @@
 local rope = require 'rope'
+local lume = require 'rope.lib.lume'
 
 local EventManager = rope.Component:subclass('EventManager')
 
@@ -23,9 +24,9 @@ function EventManager:awake()
             trigger = function(self, component)
                 -- alert all listeners that an event was just triggered,
                 -- and which game object triggered it
-                for _, listener in ipairs(self.listeners) do
+                lume(self.listeners):each(function(listener)
                     listener:eventStart(component.gameObject)
-                end
+                end)
             end
         }
     end

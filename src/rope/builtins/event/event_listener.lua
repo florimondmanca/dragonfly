@@ -1,4 +1,5 @@
 local rope = require 'rope'
+local lume = require 'rope.lib.lume'
 
 local EventListener = rope.Component:subclass('EventListener')
 
@@ -18,7 +19,7 @@ end
 function EventListener:awake()
     local e = self.globals.events[self.event]
     assert(e, 'EventListener could not find event ' .. self.event)
-    e.listeners[#e.listeners + 1] = self
+    lume.push(e.listeners, self)
 end
 
 function EventListener:eventStart(source)

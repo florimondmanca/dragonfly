@@ -1,5 +1,4 @@
 local rope = require 'rope'
-local lume = require 'rope.lib.lume'
 local geometry = require 'rope.geometry'
 local asserts = require 'rope.asserts'
 local Collider = require 'rope.builtins.colliders._collider'
@@ -22,7 +21,7 @@ function Component:initialize(arguments)
     else
         arguments.shape = geometry.Rectangle(1, 1, arguments.origin)
     end
-    lume.reject(arguments, 'width', 'height')
+    arguments.width, arguments.height = nil, nil
     rope.Component.initialize(self, arguments)
     self.collisions = {}
 end
