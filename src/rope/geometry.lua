@@ -225,6 +225,30 @@ function Rectangle:initialize(width, height, origin)
     self.origin = origin or Vector()
 end
 
+----- centers the rectangle by displacing its origin towards its center
+function Rectangle:center()
+    self.origin = self.origin + Vector(-self.width/2, -self.height/2)
+end
+
+----- sets the dimensions of the rectangle
+-- two possible usages:
+-- * rect:setDims(width, height)
+-- * rect:setDims(otherRect)
+function Rectangle:setDims(width, height)
+    if class.isInstanceOf(width, Rectangle) then
+        width, height = width.width, width.height
+    end
+    self.width = width
+    self.height = height
+end
+
+function Rectangle:setFrom(other)
+    asserts.isInstanceOf(Rectangle, other)
+    self.width = other.width
+    self.height = other.height
+    self.origin = other.origin
+end
+
 function Rectangle:vertices()
     return {
         topleft = self.origin,

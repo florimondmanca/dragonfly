@@ -38,7 +38,7 @@ return {
             script = 'rope.builtins.colliders.rectangle_collider',
             arguments = {
                 group = 'enemy',
-                dimsFrom = 'rope.builtins.graphics.image_renderer'
+                shapeFrom = 'rope.builtins.graphics.image_renderer'
             }
         },
     }

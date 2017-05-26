@@ -89,7 +89,7 @@ return {
                     script = 'rope.builtins.colliders.rectangle_collider',
                     arguments = {
                         group = 'player',
-                        dimsFrom = 'rope.builtins.graphics.sprite_animation',
+                        shapeFrom = 'rope.builtins.graphics.sprite_animation',
                     }
                 },
                 {

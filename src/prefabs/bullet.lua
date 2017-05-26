@@ -13,7 +13,7 @@ return {
             script = 'rope.builtins.colliders.rectangle_collider',
             arguments = {
                 group = 'bullet',
-                dimsFrom = 'rope.builtins.graphics.image_renderer'
+                shapeFrom = 'rope.builtins.graphics.image_renderer'
             }
         },
         {
