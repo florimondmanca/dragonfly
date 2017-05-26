@@ -1,4 +1,5 @@
 local class = require 'rope.class'
+local lume = require 'rope.lib.lume'
 local asserts = require 'rope.asserts'
 
 
@@ -198,8 +199,10 @@ function Edge:contains(vector)
     local u = self.point2 - self.point1
     local v = vector - self.point1
     return
-        u.y*v.x == v.y*u.x -- colinear
-        and (0 <= v.x/u.x and v.x/u.x <= 1 and 0 <= v.y/u.y and v.y/u.y <= 1) -- lies on segment
+        -- colinear
+        u.y*v.x == v.y*u.x
+        -- lies on segment
+        and (0 <= v.x/u.x and v.x/u.x <= 1 and 0 <= v.y/u.y and v.y/u.y <= 1)
 end
 
 
@@ -309,18 +312,15 @@ end
 function Polygon:edges()
     local edges = {}
     for i = 1, #self.vertices - 1 do
-        table.insert(edges, Edge(self.vertices[i], self.vertices[i+1]))
+        lume.push(edges, Edge(self.vertices[i], self.vertices[i+1]))
     end
-    table.insert(edges, Edge(self.vertices[#self.vertices], self.vertices[1]))
+    lume.push(edges, Edge(self.vertices[#self.vertices], self.vertices[1]))
     return edges
 end
 
 function Polygon:coords()
     local coords = {}
-    for _, vertex in ipairs(self.vertices) do
-        table.insert(coords, vertex.x)
-        table.insert(coords, vertex.y)
-    end
+    lume(self.vertices):each(function(v) lume.push(coords, v.x, v.y) end)
     return coords
 end
 
@@ -351,9 +351,10 @@ local function intersectingCircleAndEdge(cir, edge, transform1, transform2)
     -- d is the projection of c on the segment ab
     local t = ((c-a):dot(ab))/ab:norm2()
     local d = a + t * ab
-    return
-        (d-c):norm2() <= cir.radius^2
-        and (d-a):dot(ab) > 0 and (d-b):dot(ab) < 0
+    return lume.all({
+        (d-c):norm2() <= cir.radius^2,
+        (d-a):dot(ab) > 0 and (d-b):dot(ab) < 0
+    })
 end
 
 ----- tests if two edges intersect
@@ -369,39 +370,34 @@ local function intersectingEdges(edge1, edge2, transform1, transform2)
     --
     local t1 = (-v2.y * b.x + v2.x * b.y)/det
     local t2 = (-v1.y * b.x + v1.x * b.y)/det
-    return 0 <= t1 and t1 <= 1 and 0 <= t2 and t2 <= 1
+    return lume.all({0 <= t1, t1 <= 1, 0 <= t2, t2 <= 1})
 end
 
 ----- tests if two (axis-aligned) rectangles intersect
 local function intersectingRectangles(rect1, rect2, transform1, transform2)
     rect1 = rect1:globalRectangle(transform1)
     rect2 = rect2:globalRectangle(transform2)
-    return
-        rect2.origin.x - rect1.width <= rect1.origin.x
-        and rect1.origin.x <= rect2.origin.x + rect2.width
-        and rect2.origin.y - rect1.height <= rect1.origin.y
-        and rect1.origin.y <= rect2.origin.y + rect2.height
+    return lume.all({
+        rect2.origin.x - rect1.width <= rect1.origin.x,
+        rect1.origin.x <= rect2.origin.x + rect2.width,
+        rect2.origin.y - rect1.height <= rect1.origin.y,
+        rect1.origin.y <= rect2.origin.y + rect2.height
+    })
 end
 
 ----- tests if a rectangle intersects with an edge
 local function intersectingRectangleAndEdge(rect, edge, transform1, transform2)
     -- intersection <=> the edge collides with one of the rectangle's sides
-    for _, side in pairs(rect:edges()) do
-        if intersectingEdges(side, edge, transform1, transform2) then
-            return true
-        end
-    end
-    return false
+    return lume.any(rect:edges(), function(side)
+        return intersectingEdges(side, edge, transform1, transform2)
+    end)
 end
 
 ----- tests if a rectangle intersects with a circle
 local function intersectingRectangleAndCircle(rect, cir, transform1, transform2)
-    for _, edge in pairs(rect:edges()) do
-        if intersectingCircleAndEdge(cir, edge, transform2, transform1) then
-            return true
-        end
-    end
-    return false
+    return lume.any(rect:edges(), function(edge)
+        return intersectingCircleAndEdge(cir, edge, transform2, transform1)
+    end)
 end
 
 
