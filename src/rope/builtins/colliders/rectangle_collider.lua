@@ -1,4 +1,5 @@
 local rope = require 'rope'
+local lume = require 'rope.lib.lume'
 local geometry = require 'rope.geometry'
 local asserts = require 'rope.asserts'
 local Collider = require 'rope.builtins.colliders._collider'
@@ -15,23 +16,19 @@ local Component = Collider:subclass('RectangleCollider')
 -- @tparam string dimsFrom the script of the component to get the dimensions from
 function Component:initialize(arguments)
     arguments.origin = geometry.Vector(arguments.origin)
-    arguments.dimsFrom = arguments.dimsFrom or nil
     if not arguments.dimsFrom then
         self:require(arguments, 'width', 'height')
         arguments.shape = geometry.Rectangle(arguments.width, arguments.height, arguments.origin)
     else
         arguments.shape = geometry.Rectangle(1, 1, arguments.origin)
     end
-    arguments.width, arguments.height = nil, nil
+    lume.reject(arguments, 'width', 'height')
     rope.Component.initialize(self, arguments)
     self.collisions = {}
 end
 
 function Component:worksWith()
-    if self.dimsFrom then
-        return {source = {script = self.dimsFrom}}
-    else return {}
-    end
+    return self.dimsFrom and {source = {script = self.dimsFrom}} or {}
 end
 
 function Component:awake()

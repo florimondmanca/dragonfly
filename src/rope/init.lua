@@ -36,13 +36,7 @@ end
 -- @param ... a varargs of strings.
 -- @raise error if any of the required arguments is missing.
 function Component:require(arguments, ...)
-    local missing = {}
-    arguments = arguments or {}
-    for _, argName in ipairs{...} do
-        if arguments[argName] == nil then
-            lume.push(missing, argName)
-        end
-    end
+    local missing = lume.filter({...}, function(name) return arguments[name] == nil end)
     if #missing > 0 then
         error('Component ' .. self.class.name
         .. ' required the folloing missing arguments: '

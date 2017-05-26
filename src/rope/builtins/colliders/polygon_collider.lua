@@ -1,4 +1,5 @@
 local rope = require 'rope'
+local lume = require 'rope.lib.lume'
 local geometry = require 'rope.geometry'
 local asserts = require 'rope.asserts'
 local Collider = require 'rope.builtins.colliders._collider'
@@ -13,7 +14,7 @@ function Component:initialize(arguments)
     self:require(arguments, 'points')
     asserts.hasType('table', arguments.points, 'points')
     self.shape = geometry.Polygon(arguments.points)
-    arguments.points = nil
+    lume.reject(arguments, 'points')
     rope.Component.initialize(self, arguments)
     self.collisions = {}
 end

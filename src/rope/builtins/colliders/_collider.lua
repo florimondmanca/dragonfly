@@ -1,5 +1,6 @@
 local rope = require 'rope'
 local class = require 'rope.class'
+local lume = require 'rope.lib.lume'
 local geometry = require 'rope.geometry'
 local asserts = require 'rope.asserts'
 
@@ -54,9 +55,8 @@ end
 
 ----- updates the collider by removing resolved collisions.
 function Collider:update()
-    for collider, collisions in pairs(self.collisions) do
-        if collisions <= 0 then self.collisions[collider] = nil end
-    end
+    self.collisions = lume.reject(self.collisions,
+        function(c) return c <= 0 end, true)
 end
 
 ----- tests if collider collides with another collider, shape or point.

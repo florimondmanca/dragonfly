@@ -1,4 +1,5 @@
 local rope = require 'rope'
+local lume = require 'rope.lib.lume'
 local geometry = require 'rope.geometry'
 local Collider = require 'rope.builtins.colliders._collider'
 
@@ -12,7 +13,7 @@ local Component = Collider:subclass('EdgeCollider')
 function Component:initialize(arguments)
     self:require(arguments, 'point1', 'point2')
     self.shape = geometry.Edge(geometry.Vector(arguments.point1), geometry.Vector(arguments.point2))
-    arguments.point1, arguments.point2 = nil, nil
+    lume.reject(arguments, 'point1', 'point2')
     rope.Component.initialize(self, arguments)
     self.collisions = {}
 end
