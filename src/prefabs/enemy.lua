@@ -5,6 +5,11 @@ return {
             script = 'rope.builtins.graphics.image_renderer',
             arguments = {filename = 'static/img/enemy.png'}
         },
+        -- shape
+        {
+            script = 'rope.builtins.shapes.rectangle',
+            arguments = {shapeFrom = 'rope.builtins.graphics.image_renderer'}
+        },
         -- motion control
         {
             script = 'components.movement.velocity'
@@ -38,7 +43,7 @@ return {
             script = 'rope.builtins.colliders.rectangle_collider',
             arguments = {
                 group = 'enemy',
-                shapeFrom = 'rope.builtins.graphics.image_renderer'
+                shape = 'rope.builtins.graphics.image_renderer'
             }
         },
     }

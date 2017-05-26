@@ -1,7 +1,7 @@
 local Resolver = require 'rope.builtins.colliders._resolver'
 local geometry = require 'rope.geometry'
 
-local COLLIDER_SCRIPT = 'rope.builtins.colliders.rectangle_collider'
+local COLLIDER_SCRIPT = 'rope.builtins.colliders.collider'
 local COLLIDER = require(COLLIDER_SCRIPT)
 
 local Component = Resolver:subclass('BlockResolver')

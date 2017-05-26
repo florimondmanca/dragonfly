@@ -86,10 +86,15 @@ return {
                 },
                 -- collision
                 {
+                    script = 'rope.builtins.shapes.rectangle',
+                    arguments = {
+                        shapeFrom = 'rope.builtins.graphics.sprite_animation',
+                    }
+                },
+                {
                     script = 'rope.builtins.colliders.rectangle_collider',
                     arguments = {
                         group = 'player',
-                        shapeFrom = 'rope.builtins.graphics.sprite_animation',
                     }
                 },
                 {

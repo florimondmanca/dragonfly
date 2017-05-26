@@ -1,5 +1,5 @@
 return {
-    firstScene = 'scenes/menu.lua',
+    firstScene = 'scenes/main.lua',
     window = {
         title = 'LOVE!',
         width = 800,

@@ -1,6 +1,6 @@
 local rope = require 'rope'
 
-local COLLIDER_SCRIPT = 'rope.builtins.colliders._collider'
+local COLLIDER_SCRIPT = 'rope.builtins.colliders.collider'
 
 local Component = rope.Component:subclass('IgnoreGroups')
 

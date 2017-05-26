@@ -8,12 +8,15 @@ return {
             script = 'rope.builtins.graphics.image_renderer',
             -- give filename
         },
+        {
+            script = 'rope.builtins.shapes.rectangle',
+            arguments = {shapeFrom = 'rope.builtins.graphics.image_renderer'}
+        },
         -- collision
         {
             script = 'rope.builtins.colliders.rectangle_collider',
             arguments = {
                 group = 'bullet',
-                shapeFrom = 'rope.builtins.graphics.image_renderer'
             }
         },
         {

@@ -5,10 +5,12 @@ return {
             arguments = {text = 'Button', alignCenter = true}
         },
         {
-            script = 'rope.builtins.colliders.rectangle_collider',
-            arguments = {
-                shapeFrom = 'rope.builtins.graphics.text_renderer',
-            }
+            script = 'components.rectangle_shape',
+            arguments = {shapeFrom = 'rope.builtins.graphics.text_renderer'}
+        },
+        {
+            script = 'components.button',
+            arguments = {button = 1}
         },
     }
 }

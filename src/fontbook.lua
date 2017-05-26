@@ -1,3 +1,7 @@
+local lume = require 'rope.lib.lume'
+
+lume.trace('building font book')
+
 ----- the font book memorizes past accesses to a font and size
 local fontbook = {}
 

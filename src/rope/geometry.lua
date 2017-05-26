@@ -141,7 +141,7 @@ function Circle:globalCenter(transform)
     return transform.position + self.center
 end
 
-function Circle:globalCircle(transform)
+function Circle:globalShape(transform)
     return Circle(self.radius * transform.size.x,
         self:globalCenter(transform)
     )
@@ -191,7 +191,7 @@ function Edge:globalVertices(transform, ignoreRotation)
 	return globalVertices
 end
 
-function Edge:globalEdge(transform)
+function Edge:globalShape(transform)
     return Edge(unpack(self:globalVertices(transform)))
 end
 
@@ -279,7 +279,7 @@ function Rectangle:globalVertices(transform, ignoreRotation)
 	return globalVertices
 end
 
-function Rectangle:globalRectangle(transform)
+function Rectangle:globalShape(transform)
 	return Rectangle(
 		self.width * transform.size.x,
 		self.height * transform.size.y,
@@ -349,10 +349,10 @@ function Polygon:coords()
 end
 
 function Polygon:globalCoords(transform)
-    return (self:globalPolygon(transform)):coords()
+    return (self:globalShape(transform)):coords()
 end
 
-function Polygon:globalPolygon(transform)
+function Polygon:globalShape(transform)
 	return self.class(self:globalVertices(transform))
 end
 
@@ -368,7 +368,7 @@ end
 
 ----- tests if a circle and an edge intersect
 local function intersectingCircleAndEdge(cir, edge, transform1, transform2)
-    cir = cir:globalCircle(transform1)
+    cir = cir:globalShape(transform1)
     local c = cir.center
     local a, b = unpack(edge:globalVertices(transform2))
     local ab = b - a  -- direction a -> b
@@ -399,8 +399,8 @@ end
 
 ----- tests if two (axis-aligned) rectangles intersect
 local function intersectingRectangles(rect1, rect2, transform1, transform2)
-    rect1 = rect1:globalRectangle(transform1)
-    rect2 = rect2:globalRectangle(transform2)
+    rect1 = rect1:globalShape(transform1)
+    rect2 = rect2:globalShape(transform2)
     return lume.all({
         rect2.origin.x - rect1.width <= rect1.origin.x,
         rect1.origin.x <= rect2.origin.x + rect2.width,
@@ -451,14 +451,14 @@ local function intersecting(shape1, shape2, transform1, transform2)
             return shape1.x == shape2.x and shape1.y == shape2.y
         -- ... a circle, a rectangle or an edge
         else
-            return shape2:contains(shape1)
+            return shape2:globalShape(transform2):contains(shape1)
         end
 
     -- intersection between an edge and...
     elseif shape1Type == Edge then
         -- ... a point
         if shape2Type == Vector then
-            return shape1:contains(shape2)
+            return shape1:globalShape(transform1):contains(shape2)
         -- ... an edge
         elseif shape2Type == Edge then
             return intersectingEdges(shape1, shape2, transform1, transform2)
@@ -474,7 +474,7 @@ local function intersecting(shape1, shape2, transform1, transform2)
     elseif shape1Type == Rectangle then
         -- ... a point
         if shape2Type == Vector then
-            return shape1:contains(shape2)
+            return shape1:globalShape(transform1):contains(shape2)
         -- an edge
         elseif shape2Type == Edge then
             return intersectingRectangleAndEdge(shape1, shape2, transform1, transform2)
@@ -490,7 +490,7 @@ local function intersecting(shape1, shape2, transform1, transform2)
     elseif shape1Type == Circle then
         -- ... a point
         if shape2Type == Vector then
-            return shape1:contains(shape2)
+            return shape1:globalShape(transform1):contains(shape2)
         -- ... an edge
         elseif shape2Type == Edge then
             return intersectingCircleAndEdge(shape1, shape2, transform1, transform2)
@@ -505,8 +505,8 @@ local function intersecting(shape1, shape2, transform1, transform2)
 end
 
 local function rectanglesOverlap(rect1, rect2, transform1, transform2)
-    rect1 = rect1:globalRectangle(transform1)
-    rect2 = rect2:globalRectangle(transform2)
+    rect1 = rect1:globalShape(transform1)
+    rect2 = rect2:globalShape(transform2)
     local ox = (
         math.min(rect1.origin.x + rect1.width, rect2.origin.x + rect2.width)
         - math.max(rect1.origin.x, rect2.origin.x)

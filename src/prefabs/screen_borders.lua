@@ -7,10 +7,15 @@ unpack({
         transform = {position = {x=padx, y=-20 + pady}},
         components = {
             {
-                script = 'rope.builtins.colliders.rectangle_collider',
+                script = 'rope.builtins.shapes.rectangle',
                 arguments = {
                     width = w - 2*padx,
                     height = 20,
+                }
+            },
+            {
+                script = 'rope.builtins.colliders.rectangle_collider',
+                arguments = {
                     group = 'screen_borders',
                     static = true,
                 }
@@ -27,10 +32,15 @@ unpack({
         transform = {position = {x=w - padx, y=pady}},
         components = {
             {
-                script = 'rope.builtins.colliders.rectangle_collider',
+                script = 'rope.builtins.shapes.rectangle',
                 arguments = {
                     width = 20,
                     height = h - 2*pady,
+                }
+            },
+            {
+                script = 'rope.builtins.colliders.rectangle_collider',
+                arguments = {
                     group = 'screen_borders',
                     static = true,
                 }
@@ -47,11 +57,15 @@ unpack({
         transform = {position = {x=padx, y=h-pady}},
         components = {
             {
-                script = 'rope.builtins.colliders.rectangle_collider',
+                script = 'rope.builtins.shapes.rectangle',
                 arguments = {
                     width = w - 2*padx,
                     height = 20,
-                    group = 'screen_borders',
+                }
+            },
+            {
+                script = 'rope.builtins.colliders.rectangle_collider',
+                arguments = {
                     static = true,
                 }
             },
@@ -67,10 +81,15 @@ unpack({
         transform = {position = {x=-20 + padx, y=pady}},
         components = {
             {
-                script = 'rope.builtins.colliders.rectangle_collider',
+                script = 'rope.builtins.shapes.rectangle',
                 arguments = {
                     width = 20,
                     height = h - 2*pady,
+                }
+            },
+            {
+                script = 'rope.builtins.colliders.rectangle_collider',
+                arguments = {
                     group = 'screen_borders',
                     static = true,
                 }

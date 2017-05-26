@@ -1,7 +1,6 @@
-local rope = require 'rope'
 local geometry = require 'rope.geometry'
 local asserts = require 'rope.asserts'
-local Collider = require 'rope.builtins.colliders._collider'
+local Collider = require 'rope.builtins.colliders.collider'
 
 local Component = Collider:subclass('PolygonLineCollider')
 
@@ -14,8 +13,7 @@ function Component:initialize(arguments)
     asserts.hasType('table', arguments.points, 'points')
     self.shape = geometry.Polygon(arguments.points)
     arguments.points = nil
-    rope.Component.initialize(self, arguments)
-    self.collisions = {}
+    Collider.initialize(self, arguments)
 end
 
 function Component:awake()

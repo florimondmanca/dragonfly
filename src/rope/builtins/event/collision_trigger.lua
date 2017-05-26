@@ -1,7 +1,7 @@
 local rope = require 'rope'
 local lume = require 'rope.lib.lume'
 
-local COLLIDER_SCRIPT = 'rope.builtins.colliders._collider'
+local COLLIDER_SCRIPT = 'rope.builtins.colliders.collider'
 
 ----- initializes a collision trigger
 -- collision triggers trigger an event when the owner's AABB and another

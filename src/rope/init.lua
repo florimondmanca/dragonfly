@@ -8,7 +8,11 @@ local function isDebug(scene, object)
     return scene.settings.debug or object.isDebug
 end
 
-
+--- default callback functions for game entities.
+local ENTITIES_CALLBACKS = {
+    'keypressed', 'keyreleased', 'mousepressed', 'mousemoved',
+    'mousereleased', 'quit', 'windowresize', 'visible'
+}
 
 ---------------
 -- Component --
@@ -220,11 +224,6 @@ function GameEntity:moveTo(x, y)
     self.transform.position = geometry.Vector(x, y)
 end
 
---- default callback functions for game entities.
-local ENTITIES_CALLBACKS = {
-    'keypressed', 'keyreleased', 'mousepressed', 'mousemoved',
-    'mousereleased', 'quit', 'windowresize', 'visible'
-}
 for _, f in ipairs(ENTITIES_CALLBACKS) do
     GameEntity[f] = function(self, ...)
         for _, child in ipairs(self.children) do child[f](child, ...) end
@@ -361,6 +360,7 @@ end
 
 --- destroys a game object
 function GameObject:destroy()
+    lume.trace('destroying', self.name)
     self.gameScene:removeGameObject(self)
 end
 
@@ -441,6 +441,7 @@ end
 -- @tparam GameScene scene
 -- @tparam table object a game object in its table representation.
 local function buildObject(scene, object, trackObject)
+    lume.trace('building', object.name)
     -- create the game object and add it to the scene
     local gameObject = GameObject(
         scene, object.name, object.transform, nil, trackObject)
@@ -454,18 +455,15 @@ local function buildObject(scene, object, trackObject)
         end
     end
     -- add components
-    lume.each(
-        object.components,
+    lume.each(object.components,
         function(c) gameObject:buildAndAddComponent(c) end
     )
     -- add children
-    lume.each(
-        lume.filter(
-            object.children or {},
-            function(c) return isDebug(scene, c) end
-        ),
-        function(c) gameObject:addChild(buildObject(scene, c)) end
-    )
+    for _, child in ipairs(object.children or {}) do
+        if not isDebug(scene, child) then
+            gameObject:addChild(buildObject(scene, child))
+        end
+    end
     return gameObject
 end
 

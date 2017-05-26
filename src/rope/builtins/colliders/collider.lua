@@ -2,17 +2,14 @@ local rope = require 'rope'
 local class = require 'rope.class'
 local lume = require 'rope.lib.lume'
 local geometry = require 'rope.geometry'
-local asserts = require 'rope.asserts'
 
 local Collider = rope.Component:subclass('Collider')
 
------ base class for all collider components
--- do not use this as a component directly! (unless you cn think of a good reason to)
--- @tparam Shape shape (required)
+
+----- a base class for all colliders
+-- do not use directly.
 -- @tparam string group a collider groups to attach the owner to (eg enemies, bullets, etc).
 function Collider:initialize(arguments)
-    self:require(arguments, 'shape')
-    asserts.isInstanceOf(geometry.Shape, arguments.shape, 'shape')
     rope.Component.initialize(self, arguments)
     self.collisions = {}
 end

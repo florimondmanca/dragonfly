@@ -10,22 +10,14 @@ function love.load()
     scene:load()
 end
 
-function love.update(...)
-    scene.update(scene, ...)
-end
+--- default callback functions for game entities.
+local ENTITIES_CALLBACKS = {
+    'update', 'draw',
+    'keypressed', 'keyreleased',
+    'mousepressed', 'mousemoved', 'mousereleased',
+    'quit', 'windowresize', 'visible'
+}
 
-function love.draw(...)
-    scene.draw(scene, ...)
-end
-
-function love.mousepressed(...)
-    scene.mousepressed(scene, ...)
-end
-
-function love.keypressed(...)
-    scene.keypressed(scene, ...)
-end
-
-function love.quit(...)
-    scene.quit(scene, ...)
+for _, f in ipairs(ENTITIES_CALLBACKS) do
+    love[f] = function(...) scene[f](scene, ...) end
 end

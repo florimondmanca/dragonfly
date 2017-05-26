@@ -23,12 +23,14 @@ return {
             transform = {position = {x = 200, y = 200}},
             components = {
                 {
+                    script = 'rope.builtins.shapes.rectangle',
+                    arguments = {width = 200, height = 300}
+                },
+                {
                     script = 'rope.builtins.colliders.rectangle_collider',
                     arguments = {
-                        width = 200,
-                        height = 300,
                         group = 'rectangle1',
-                        static = true,
+                        -- static = true,
                     }
                 },
                 {
@@ -43,12 +45,14 @@ return {
             name = 'Rectangle 2',
             components = {
                 {
+                    script = 'rope.builtins.shapes.rectangle',
+                    arguments = {width = 100, height = 50}
+                },
+                {
                     script = 'rope.builtins.colliders.rectangle_collider',
                     arguments = {
-                        width = 100,
-                        height = 50,
                         group = 'rectangle2',
-                        -- static = true
+                        static = true
                     }
                 },
                 {script = 'rope.builtins.mouse.link'},
