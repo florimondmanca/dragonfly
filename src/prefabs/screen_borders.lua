@@ -66,6 +66,7 @@ unpack({
             {
                 script = 'rope.builtins.colliders.rectangle_collider',
                 arguments = {
+                    group = 'screen_borders',
                     static = true,
                 }
             },
