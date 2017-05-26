@@ -16,8 +16,10 @@ function Camera:awake()
     end
     -- apply(target) is called for each object draw
     self.gameObject.apply = function(self, target)
-        local pos = self.globalTransform.position
-        target:move(-pos.x, -pos.y)
+        target:move(
+            -self.globalTransform.position.x,
+            -self.globalTransform.position.y
+        )
     end
     -- unset() must be called after all draws
     self.gameObject.unset = function(self)
@@ -25,15 +27,14 @@ function Camera:awake()
     end
     -- mousePosition() gives the mouse position from the camera's point of view
     self.gameObject.mousePosition = function(self)
-        local pos = self.globalTransform.position
-        local scale = self.globalTransform.size
-        return love.mouse.getX() * scale.x + pos.x, love.mouse.getY() * scale.y + pos.y
+        return
+            love.mouse.getX() * self.globalTransform.size.x + self.globalTransform.position.x,
+            love.mouse.getY() * self.globalTransform.size.y + self.globalTransform.position.y
     end
     -- boundaries() gives top, left, right and bottom values of camera's
     -- viewport
     self.gameObject.boundaries = function(self)
-        local pos = self.globalTransform.position
-        local dx, dy = pos.x, pos.y
+        local dx, dy = self.globalTransform.position.x, self.globalTransform.position.y
         local left, right = dx, dx + love.graphics.getWidth()
         local top, bottom = dy, dy + love.graphics.getHeight()
         return {left=left, right=right, top=top, bottom=bottom}
