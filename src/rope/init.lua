@@ -336,6 +336,10 @@ function GameObject:buildAndAddComponent(component)
     return self:addComponent(componentClass(component.arguments or {}))
 end
 
+function GameObject:buildAndAddComponents(components)
+    lume.each(components, function(c) self:buildAndAddComponent(c) end)
+end
+
 --- gets one component of a game object based on its type.
 -- @tparam Component componentType the component's class or a string refering to the component's module filename.
 -- @tparam func filter optional filter function: f(component) -> true or false.

@@ -21,16 +21,14 @@ return {
                 {
                     script = 'rope.builtins.event.event_manager',
                     arguments = {events = {
-                        'player_shoot',
+                        'player_shoot', 'enemy_spawn',
                     }}
                 },
                 {
                     script = 'rope.builtins.event.key_trigger',
                     arguments = {event = 'player_shoot', key = 'space'}
                 },
-                {
-                    script = 'rope.builtins.event.collision_trigger',
-                },
+                {script = 'rope.builtins.event.collision_trigger'},
             },
         },
         -- sprites
@@ -105,28 +103,16 @@ return {
             },
         },
         {
-            name = 'Enemy',
-            transform = {position = {
-                x = 600,
-                y = h/2
-            }},
-            prefab = 'prefabs.enemy',
+            name = 'Enemy Spawner 1',
+            transform = {position = {x = 820, y = 0}},
+            components = require('prefabs.enemy_spawner'){
+                axis='x', below=w, event='enemy_spawn'}
         },
         {
-            name = 'Enemy',
-            transform = {position = {
-                x = 675,
-                y = h/2
-            }},
-            prefab = 'prefabs.enemy',
-        },
-        {
-            name = 'Enemy',
-            transform = {position = {
-                x = 750,
-                y = h/2
-            }},
-            prefab = 'prefabs.enemy'
+            name = 'Enemy Spawner 2',
+            transform = {position = {x = 900, y = 0}},
+            components = require('prefabs.enemy_spawner'){
+                axis='x', below=w, event='enemy_spawn'}
         },
         -- screen borders
         require('prefabs.screen_borders')(w, h),

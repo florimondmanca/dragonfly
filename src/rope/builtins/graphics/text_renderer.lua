@@ -5,12 +5,13 @@ local Component = rope.Component:subclass('TextRenderer')
 
 ----- initializes a text renderer
 -- @tparam string text an initial text to render (default is empty string)
+-- @tparam number fontSize (optional, default is love's default)
 -- @tparam table color the color of the text (default is white)
 function Component:initialize(arguments)
     arguments.color = arguments.color or {255, 255, 255, 255}
     arguments.text = arguments.text or ''
     rope.Component.initialize(self, arguments)
-    self.font = love.graphics.getFont()
+    self.font = arguments.fontSize and love.graphics.newFont(arguments.fontSize) or love.graphics.getFont()
     self.textObject = love.graphics.newText(self.font, self.text)
     self.shape = geometry.Rectangle(self.textObject:getWidth(), self.textObject:getHeight())
 end
