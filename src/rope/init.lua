@@ -246,14 +246,10 @@ local function getComponents(self, componentType, num, filter)
         componentType = require(componentType)
         assert(componentType, 'Component ' .. tostring(componentType) .. ' does not exist')
     end
-    local found = {}
-    for _, component in ipairs(self.components) do
-        if component:isInstanceOf(componentType) and filter(component) then
-            lume.push(found, component)
-        end
-        if (num and #found >= num) then return found end
-    end
-    return found
+    local found = lume.filter(self.components, function(c)
+        return c:isInstanceOf(componentType) and filter(c)
+    end)
+    return num and lume.first(found, num) or found
 end
 
 local GameObject = GameEntity:subclass('GameObject')
